@@ -1,20 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
+import InfluencerFeedCard, { type InfluencerFeedCardProps } from './InfluencerFeedCard';
 
-interface Influencer {
-  id: string;
-  name: string;
-  handle?: string;
-  avatar: string;
-  content: string;
-  source: string;
-  timeAgo: string;
-  type: 'tweet' | 'interview' | 'podcast';
-}
-
-const influencerData: Influencer[] = [
+const influencerData: InfluencerFeedCardProps[] = [
   {
     id: 'vitalik',
     name: 'Vitalik Buterin',
@@ -46,12 +35,6 @@ const influencerData: Influencer[] = [
     type: 'podcast'
   }
 ];
-
-const typeIcons = {
-  tweet: '🐦',
-  interview: '📺',
-  podcast: '🎙️'
-};
 
 export default function InfluencerFeed() {
   const [showFilter, setShowFilter] = useState(false);
@@ -117,41 +100,7 @@ export default function InfluencerFeed() {
 
       <div id="influencers-feed">
         {filteredInfluencers.map(inf => (
-          <div 
-            key={inf.id} 
-            className="rounded-xl p-6 border mb-4 transition-colors"
-            style={{ 
-              backgroundColor: 'var(--bg-card)', 
-              borderColor: 'var(--border-color)' 
-            }}
-          >
-            <div className="flex items-center text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
-              <span className="mr-2">{typeIcons[inf.type]}</span>
-              <span>{inf.source} · {inf.timeAgo}</span>
-            </div>
-            <div className="flex items-start">
-              <div className="w-10 h-10 rounded-full bg-gray-600 mr-3 flex-shrink-0 overflow-hidden">
-                <Image
-                  src={inf.avatar}
-                  alt={inf.name}
-                  width={40}
-                  height={40}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  {inf.name}
-                  {inf.handle && (
-                    <span className="font-normal ml-1" style={{ color: 'var(--text-secondary)' }}>
-                      {inf.handle}
-                    </span>
-                  )}
-                </p>
-                <p className="mt-2 text-[15px] leading-relaxed" style={{ color: 'var(--text-primary)' }}>{inf.content}</p>
-              </div>
-            </div>
-          </div>
+          <InfluencerFeedCard key={inf.id} {...inf} />
         ))}
       </div>
     </section>
