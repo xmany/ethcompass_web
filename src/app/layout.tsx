@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body
-        className={`${notoSansSC.variable} font-sans antialiased bg-gray-900 text-gray-200`}
+        className={`${notoSansSC.variable} font-sans antialiased bg-gray-900 text-gray-300`}
       >
         {children}
       </body>

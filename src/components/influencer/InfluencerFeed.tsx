@@ -86,7 +86,7 @@ export default function InfluencerFeed() {
       </div>
 
       {showFilter && (
-        <div className="bg-gray-800 p-4 rounded-lg mb-4">
+        <div className="bg-[#1F2937] p-4 rounded-lg mb-4 border border-[#374151]">
           <p className="font-semibold mb-3 text-gray-200">选择要显示的人物：</p>
           <div className="space-y-3">
             {influencerData.map(inf => (
@@ -111,13 +111,13 @@ export default function InfluencerFeed() {
 
       <div id="influencers-feed">
         {filteredInfluencers.map(inf => (
-          <div key={inf.id} className="bg-gray-800 rounded-xl p-5 border border-gray-700 mb-4">
+          <div key={inf.id} className="bg-[#1F2937] rounded-xl p-5 border border-[#374151] mb-4">
             <div className="flex items-center text-sm text-gray-400 mb-3">
               <span className="mr-2">{typeIcons[inf.type]}</span>
               <span>{inf.source} · {inf.timeAgo}</span>
             </div>
             <div className="flex items-start">
-              <div className="w-10 h-10 rounded-full bg-gray-600 mr-3 overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-gray-600 mr-3 flex-shrink-0 overflow-hidden">
                 <Image
                   src={inf.avatar}
                   alt={inf.name}
@@ -126,8 +126,8 @@ export default function InfluencerFeed() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="flex-1">
-                <p className="font-semibold text-white">
+              <div className="flex-1 min-w-0">
+                <p className="text-base font-semibold text-white">
                   {inf.name}
                   {inf.handle && (
                     <span className="text-gray-400 font-normal ml-1">
@@ -135,7 +135,7 @@ export default function InfluencerFeed() {
                     </span>
                   )}
                 </p>
-                <p className="mt-1 text-gray-300">{inf.content}</p>
+                <p className="mt-1 text-gray-300 text-sm">{inf.content}</p>
               </div>
             </div>
           </div>

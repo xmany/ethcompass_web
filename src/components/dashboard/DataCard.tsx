@@ -14,7 +14,7 @@ export default function DataCard({ label, value, change, changeColor = 'gray', s
   }[changeColor];
 
   return (
-    <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+    <div className="bg-[#1F2937] rounded-xl p-4 border border-[#374151]">
       <p className="text-sm text-gray-400">{label}</p>
       <p className={`text-2xl font-bold ${changeColor === 'green' ? 'text-green-400' : 'text-white'}`}>
         {value}

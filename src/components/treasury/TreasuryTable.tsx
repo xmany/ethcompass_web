@@ -59,7 +59,7 @@ export default function TreasuryTable() {
     <section id="treasuries-section" className="pt-6 border-t border-gray-700">
       <h2 className="text-lg font-semibold text-gray-300 mb-3">ETH Treasury 公司追踪</h2>
       
-      <div className="bg-gray-800 rounded-xl p-5 border border-gray-700 overflow-x-auto horizontal-scroll mb-4">
+      <div className="bg-[#1F2937] rounded-xl p-5 border border-[#374151] overflow-x-auto horizontal-scroll mb-4">
         <table className="w-full text-left text-sm whitespace-nowrap">
           <thead className="text-gray-400 border-b border-gray-600">
             <tr>
