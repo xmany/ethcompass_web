@@ -58,6 +58,22 @@
             background-color: #4B5563;
             border-radius: 20px;
         }
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+        .tag-blue { background-color: #1E40AF; color: #DBEAFE; }
+        .tag-green { background-color: #065F46; color: #D1FAE5; }
+        .tag-red { background-color: #991B1B; color: #FEE2E2; }
+        .tag-yellow { background-color: #92400E; color: #FEF3C7; }
+        .filter-checkbox:checked {
+            background-color: #3B82F6;
+            border-color: #3B82F6;
+        }
     </style>
 </head>
 <body>
@@ -77,31 +93,72 @@
             <div class="lg:col-span-2 order-2 lg:order-1">
                 <!-- Section: Unified Feed -->
                 <section id="unified-feed-section" class="mb-8 pt-8 lg:pt-0">
-                    <h2 class="section-title">统一信息流</h2>
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="section-title mb-0">统一信息流</h2>
+                        <button id="feed-filter-btn" class="flex items-center text-blue-400 text-sm bg-gray-800 px-3 py-1 rounded-md hover:bg-gray-700 transition">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            筛选信息
+                        </button>
+                    </div>
+                    <!-- Feed Filter Panel -->
+                    <div id="feed-filter-panel" class="hidden bg-gray-800 p-4 rounded-lg mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <h4 class="font-semibold mb-2 text-gray-300">信息来源</h4>
+                                <div class="space-y-1">
+                                    <label class="flex items-center"><input type="checkbox" data-filter-group="source" value="coindesk" class="filter-checkbox bg-gray-700 border-gray-600 rounded mr-2" checked> CoinDesk</label>
+                                    <label class="flex items-center"><input type="checkbox" data-filter-group="source" value="twitter" class="filter-checkbox bg-gray-700 border-gray-600 rounded mr-2" checked> Twitter/X</label>
+                                    <label class="flex items-center"><input type="checkbox" data-filter-group="source" value="bankless" class="filter-checkbox bg-gray-700 border-gray-600 rounded mr-2" checked> Bankless</label>
+                                    <label class="flex items-center"><input type="checkbox" data-filter-group="source" value="techflow" class="filter-checkbox bg-gray-700 border-gray-600 rounded mr-2" checked> 深潮TechFlow</label>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-2 text-gray-300">信息类型</h4>
+                                <div class="space-y-1">
+                                    <label class="flex items-center"><input type="checkbox" data-filter-group="type" value="news" class="filter-checkbox bg-gray-700 border-gray-600 rounded mr-2" checked> 新闻</label>
+                                    <label class="flex items-center"><input type="checkbox" data-filter-group="type" value="analysis" class="filter-checkbox bg-gray-700 border-gray-600 rounded mr-2" checked> 深度分析</label>
+                                    <label class="flex items-center"><input type="checkbox" data-filter-group="type" value="rumor" class="filter-checkbox bg-gray-700 border-gray-600 rounded mr-2" checked> 市场传闻</label>
+                                    <label class="flex items-center"><input type="checkbox" data-filter-group="type" value="alert" class="filter-checkbox bg-gray-700 border-gray-600 rounded mr-2" checked> 价格预警</label>
+                                </div>
+                            </div>
+                             <div>
+                                <h4 class="font-semibold mb-2 text-gray-300">重要性</h4>
+                                <div class="space-y-1">
+                                    <label class="flex items-center"><input type="checkbox" data-filter-group="importance" value="high" class="filter-checkbox bg-gray-700 border-gray-600 rounded mr-2" checked> 高</label>
+                                    <label class="flex items-center"><input type="checkbox" data-filter-group="importance" value="medium" class="filter-checkbox bg-gray-700 border-gray-600 rounded mr-2" checked> 中</label>
+                                    <label class="flex items-center"><input type="checkbox" data-filter-group="importance" value="low" class="filter-checkbox bg-gray-700 border-gray-600 rounded mr-2" checked> 低</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-right">
+                             <button id="reset-filters-btn" class="text-gray-400 text-sm hover:text-white mr-4">重置筛选</button>
+                             <button id="apply-filters-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">应用</button>
+                        </div>
+                    </div>
                     <div id="unified-feed">
-                        <div class="feed-card">
-                            <div class="flex items-center text-sm text-gray-400 mb-2">
-                                <span class="mr-2">📰</span>
-                                <span>CoinDesk · 5分钟前</span>
+                        <div class="feed-card" data-source="coindesk" data-type="news" data-importance="high">
+                            <div class="flex items-center justify-between text-sm text-gray-400 mb-2">
+                                <div class="flex items-center"><span class="mr-2">📰</span><span>CoinDesk · 5分钟前</span></div>
+                                <div class="flex items-center">
+                                    <span class="tag tag-red">高重要性</span>
+                                    <span class="tag tag-blue">新闻</span>
+                                </div>
                             </div>
                             <h3 class="text-lg font-semibold text-gray-100">Ethereum Surges to New All-Time High Amid Likely September Rate Cut</h3>
                             <button class="text-blue-400 text-sm mt-3" onclick="toggleTranslation(this)">展开AI翻译与摘要 ▼</button>
                             <div class="translation-content text-gray-300">
-                                <p class="font-semibold mt-2">【AI摘要】</p>
-                                <ul class="list-disc list-inside text-sm space-y-1 mt-1">
-                                    <li>由于市场预期九月可能降息，以太坊价格飙升至历史新高。</li>
-                                    <li>大量空头头寸被清算，加剧了价格上涨的势头。</li>
-                                    <li>分析师认为，宏观经济环境的转变是推动此次上涨的关键因素。</li>
-                                </ul>
-                                <p class="font-semibold mt-3">【AI全文翻译】</p>
-                                <p class="text-sm mt-1">在市场对美联储可能于九月降息的预期日益增强的背景下，以太坊价格今日飙升，创下新的历史最高纪录。这一强劲上涨导致价值数亿美元的空头头寸被清算，进一步推动了价格的上涨。分析师指出，宏观经济环境的鸽派转向，加上以太坊生态系统内部的积极发展，共同为此次破纪录的涨势奠定了基础。交易员们正密切关注即将发布的经济数据，以寻找有关未来货币政策走向的更多线索... (此处为AI翻译内容节选)</p>
+                                <p class="font-semibold mt-2">【AI摘要】...</p>
+                                <p class="text-sm mt-1">...</p>
                             </div>
                         </div>
 
-                        <div class="feed-card">
-                            <div class="flex items-center text-sm text-gray-400 mb-3">
-                                <span class="mr-2">🐦</span>
-                                <span>Twitter/X · 25分钟前</span>
+                        <div class="feed-card" data-source="twitter" data-type="analysis" data-importance="medium">
+                             <div class="flex items-center justify-between text-sm text-gray-400 mb-3">
+                                <div class="flex items-center"><span class="mr-2">🐦</span><span>Twitter/X · 25分钟前</span></div>
+                                <div class="flex items-center">
+                                    <span class="tag tag-yellow">中重要性</span>
+                                    <span class="tag tag-green">深度分析</span>
+                                </div>
                             </div>
                             <div class="flex items-start">
                                 <img src="https://i.pravatar.cc/40?u=vitalik" class="w-10 h-10 rounded-full mr-3" alt="Vitalik Buterin">
@@ -112,30 +169,35 @@
                             </div>
                             <button class="text-blue-400 text-sm mt-3" onclick="toggleTranslation(this)">展开AI翻译 ▼</button>
                             <div class="translation-content text-gray-300">
-                                <p class="font-semibold mt-2">【AI翻译】</p>
-                                <p class="text-sm mt-1">向权益证明（PoS）的过渡仅仅是个开始。下一阶段“The Surge”将专注于Danksharding等扩容解决方案，目标是实现每秒超过10万笔交易。未来是可扩展且安全的。</p>
+                                <p class="font-semibold mt-2">【AI翻译】...</p>
                             </div>
                         </div>
 
-                        <div class="feed-card">
-                            <div class="flex items-center text-sm text-gray-400 mb-2">
-                                <span class="mr-2">📰</span>
-                                <span>深潮TechFlow · 1小时前</span>
+                        <div class="feed-card" data-source="techflow" data-type="analysis" data-importance="medium">
+                            <div class="flex items-center justify-between text-sm text-gray-400 mb-2">
+                                <div class="flex items-center"><span class="mr-2">📰</span><span>深潮TechFlow · 1小时前</span></div>
+                                <div class="flex items-center">
+                                    <span class="tag tag-yellow">中重要性</span>
+                                    <span class="tag tag-green">深度分析</span>
+                                </div>
                             </div>
                             <h3 class="text-lg font-semibold text-gray-100">解析EIP-7702：V神新提案如何改变以太坊账户抽象格局</h3>
-                            <p class="text-sm text-gray-400 mt-2">Vitalik Buterin最新提出的EIP-7702旨在引入一种新的交易类型，允许外部拥有账户（EOA）在单次交易中临时化身为智能合约钱包，极大地提升了用户体验和灵活性...</p>
+                            <p class="text-sm text-gray-400 mt-2">Vitalik Buterin最新提出的EIP-7702旨在引入一种新的交易类型...</p>
                         </div>
 
-                        <div class="feed-card">
-                            <div class="flex items-center text-sm text-gray-400 mb-2">
-                                <span class="mr-2">🎙️</span>
-                                <span>Bankless 播客 · 3小时前</span>
+                        <div class="feed-card" data-source="bankless" data-type="analysis" data-importance="high">
+                            <div class="flex items-center justify-between text-sm text-gray-400 mb-2">
+                                <div class="flex items-center"><span class="mr-2">🎙️</span><span>Bankless 播客 · 3小时前</span></div>
+                                <div class="flex items-center">
+                                    <span class="tag tag-red">高重要性</span>
+                                    <span class="tag tag-green">深度分析</span>
+                                </div>
                             </div>
                             <h3 class="text-lg font-semibold text-gray-100">【AI摘要】与Arthur Hayes探讨宏观经济与ETH的未来</h3>
                             <ul class="list-disc list-inside text-sm text-gray-300 space-y-1 mt-2">
                                 <li>宏观经济：全球流动性周期是影响加密资产价格的最关键因素。</li>
-                                <li>ETH定位：以太坊作为“去中心化互联网的债券”，其价值将通过质押收益和通缩机制得到体现。</li>
-                                <li>未来预测：随着ETF的普及和机构资金的流入，ETH有望在下一轮牛市中表现超越比特币。</li>
+                                <li>ETH定位：以太坊作为“去中心化互联网的债券”...</li>
+                                <li>未来预测：随着ETF的普及和机构资金的流入...</li>
                             </ul>
                         </div>
                     </div>
@@ -145,9 +207,9 @@
                 <section id="influencers-section" class="pt-6 border-t border-gray-700">
                     <div class="flex justify-between items-center section-title">
                         <h2 class="text-lg font-semibold text-gray-300">核心人物动态</h2>
-                        <button id="filter-btn" class="text-blue-400 text-sm">筛选 ▼</button>
+                        <button id="person-filter-btn" class="text-blue-400 text-sm">筛选 ▼</button>
                     </div>
-                    <div id="filter-panel" class="hidden bg-gray-800 p-4 rounded-lg mb-4">
+                    <div id="person-filter-panel" class="hidden bg-gray-800 p-4 rounded-lg mb-4">
                         <p class="font-semibold mb-2">选择要显示的人物：</p>
                         <div class="space-y-2">
                             <label class="flex items-center cursor-pointer">
@@ -190,7 +252,7 @@
                                 <img src="https://i.pravatar.cc/40?u=tomlee" class="w-10 h-10 rounded-full mr-3" alt="Tom Lee">
                                 <div>
                                     <p class="font-semibold text-white">Tom Lee <span class="text-gray-400 font-normal">@fundstrat</span></p>
-                                    <p class="mt-1 text-gray-300">【AI摘要】我们仍然看好以太坊。现货ETF的批准为机构投资者打开了大门，预计未来12个月内将有大量资金流入，ETH价格目标维持在$10,000。</p>
+                                    <p class="mt-1 text-gray-300">【AI摘要】我们仍然看好以太坊...</p>
                                 </div>
                             </div>
                         </div>
@@ -294,7 +356,7 @@
                             <span>Decrypt · 1天前</span>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-100">Public Keys: Ethereum Treasuries Soar, Bitcoin ETFs' $1 Billion Bleed</h3>
-                        <p class="text-sm text-gray-400 mt-2">本周，持有ETH作为储备资产的公司数量显著增加，其中Bitmine的持仓价值已接近50亿美元，显示出企业对以太坊作为价值储存手段的信心日益增强...</p>
+                        <p class="text-sm text-gray-400 mt-2">本周，持有ETH作为储备资产的公司数量显著增加...</p>
                     </div>
                 </section>
             </div>
@@ -315,12 +377,12 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             // Influencer filter logic
-            const filterBtn = document.getElementById('filter-btn');
-            const filterPanel = document.getElementById('filter-panel');
+            const personFilterBtn = document.getElementById('person-filter-btn');
+            const personFilterPanel = document.getElementById('person-filter-panel');
             const personToggles = document.querySelectorAll('.person-toggle');
 
-            filterBtn.addEventListener('click', () => {
-                filterPanel.classList.toggle('hidden');
+            personFilterBtn.addEventListener('click', () => {
+                personFilterPanel.classList.toggle('hidden');
             });
 
             const updateInfluencerFeed = () => {
@@ -336,9 +398,55 @@
             personToggles.forEach(toggle => {
                 toggle.addEventListener('change', updateInfluencerFeed);
             });
-
-            // Initial run to set the correct state on page load
             updateInfluencerFeed();
+
+            // Unified Feed filter logic
+            const feedFilterBtn = document.getElementById('feed-filter-btn');
+            const feedFilterPanel = document.getElementById('feed-filter-panel');
+            const applyFiltersBtn = document.getElementById('apply-filters-btn');
+            const resetFiltersBtn = document.getElementById('reset-filters-btn');
+            const feedCards = document.querySelectorAll('#unified-feed .feed-card');
+            const filterCheckboxes = document.querySelectorAll('#feed-filter-panel input[type="checkbox"]');
+
+            feedFilterBtn.addEventListener('click', () => {
+                feedFilterPanel.classList.toggle('hidden');
+            });
+
+            const applyFeedFilters = () => {
+                const activeFilters = {};
+                
+                filterCheckboxes.forEach(checkbox => {
+                    const group = checkbox.dataset.filterGroup;
+                    if (!activeFilters[group]) {
+                        activeFilters[group] = [];
+                    }
+                    if (checkbox.checked) {
+                        activeFilters[group].push(checkbox.value);
+                    }
+                });
+
+                feedCards.forEach(card => {
+                    let isVisible = true;
+                    for (const group in activeFilters) {
+                        const selectedValues = activeFilters[group];
+                        if (selectedValues.length > 0) {
+                            const cardValue = card.dataset[group];
+                            if (!selectedValues.includes(cardValue)) {
+                                isVisible = false;
+                                break;
+                            }
+                        }
+                    }
+                    card.style.display = isVisible ? '' : 'none';
+                });
+            };
+            
+            applyFiltersBtn.addEventListener('click', applyFeedFilters);
+
+            resetFiltersBtn.addEventListener('click', () => {
+                filterCheckboxes.forEach(checkbox => checkbox.checked = true);
+                applyFeedFilters();
+            });
         });
     </script>
 

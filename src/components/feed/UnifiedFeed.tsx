@@ -1,11 +1,18 @@
+'use client';
+
+import { useState } from 'react';
 import FeedCard from './FeedCard';
+import FeedFilter, { FilterState } from './FeedFilter';
 
 const mockFeedData = [
   {
     type: 'news' as const,
     source: 'CoinDesk',
+    sourceKey: 'coindesk',
     timeAgo: '5分钟前',
     title: 'Ethereum Surges to New All-Time High Amid Likely September Rate Cut',
+    importance: 'high' as const,
+    category: 'news' as const,
     translation: {
       summary: [
         '由于市场预期九月可能降息，以太坊价格飙升至历史新高。',
@@ -18,7 +25,10 @@ const mockFeedData = [
   {
     type: 'tweet' as const,
     source: 'Twitter/X',
+    sourceKey: 'twitter',
     timeAgo: '25分钟前',
+    importance: 'medium' as const,
+    category: 'analysis' as const,
     author: {
       name: 'Vitalik Buterin',
       handle: '@VitalikButerin',
@@ -32,25 +42,49 @@ const mockFeedData = [
   {
     type: 'news' as const,
     source: '深潮TechFlow',
+    sourceKey: 'techflow',
     timeAgo: '1小时前',
+    importance: 'medium' as const,
+    category: 'analysis' as const,
     title: '解析EIP-7702：V神新提案如何改变以太坊账户抽象格局',
     summary: 'Vitalik Buterin最新提出的EIP-7702旨在引入一种新的交易类型，允许外部拥有账户（EOA）在单次交易中临时化身为智能合约钱包，极大地提升了用户体验和灵活性...'
   },
   {
     type: 'podcast' as const,
     source: 'Bankless 播客',
+    sourceKey: 'bankless',
     timeAgo: '3小时前',
+    importance: 'high' as const,
+    category: 'analysis' as const,
     title: '【AI摘要】与Arthur Hayes探讨宏观经济与ETH的未来',
     summary: '• 宏观经济：全球流动性周期是影响加密资产价格的最关键因素。\n• ETH定位：以太坊作为"去中心化互联网的债券"，其价值将通过质押收益和通缩机制得到体现。\n• 未来预测：随着ETF的普及和机构资金的流入，ETH有望在下一轮牛市中表现超越比特币。'
   }
 ];
 
 export default function UnifiedFeed() {
+  const [filters, setFilters] = useState<FilterState>({
+    source: ['coindesk', 'twitter', 'bankless', 'techflow'],
+    type: ['news', 'analysis', 'rumor', 'alert'],
+    importance: ['high', 'medium', 'low'],
+  });
+
+  const handleFilterChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+  };
+
+  const filteredData = mockFeedData.filter(item => {
+    const sourceMatch = !item.sourceKey || filters.source.includes(item.sourceKey);
+    const typeMatch = !item.category || filters.type.includes(item.category);
+    const importanceMatch = !item.importance || filters.importance.includes(item.importance);
+    
+    return sourceMatch && typeMatch && importanceMatch;
+  });
+
   return (
     <section id="unified-feed-section" className="mb-8 pt-8 lg:pt-0">
-      <h2 className="text-lg font-semibold text-gray-300 mb-3">统一信息流</h2>
+      <FeedFilter onFilterChange={handleFilterChange} />
       <div id="unified-feed">
-        {mockFeedData.map((item, index) => (
+        {filteredData.map((item, index) => (
           <FeedCard key={index} {...item} />
         ))}
       </div>

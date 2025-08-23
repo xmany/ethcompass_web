@@ -111,7 +111,7 @@ export default function InfluencerFeed() {
 
       <div id="influencers-feed">
         {filteredInfluencers.map(inf => (
-          <div key={inf.id} className="bg-[#1F2937] rounded-xl p-5 border border-[#374151] mb-4">
+          <div key={inf.id} className="bg-[#1F2937] rounded-xl p-6 border border-[#374151] mb-4">
             <div className="flex items-center text-sm text-gray-400 mb-3">
               <span className="mr-2">{typeIcons[inf.type]}</span>
               <span>{inf.source} · {inf.timeAgo}</span>
@@ -135,7 +135,7 @@ export default function InfluencerFeed() {
                     </span>
                   )}
                 </p>
-                <p className="mt-1 text-gray-300 text-sm">{inf.content}</p>
+                <p className="mt-2 text-gray-300 text-[15px] leading-relaxed">{inf.content}</p>
               </div>
             </div>
           </div>
