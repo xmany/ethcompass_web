@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>以太坊罗盘 - MVP UI (自适应版)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #111827; /* Dark background */
+            color: #E5E7EB; /* Light text */
+        }
+       .data-card {
+            background-color: #1F2937;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border: 1px solid #374151;
+        }
+       .feed-card {
+            background-color: #1F2937;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            border: 1px solid #374151;
+            margin-bottom: 1rem;
+        }
+       .section-title {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            color: #D1D5DB; /* text-gray-300 */
+            margin-bottom: 0.75rem; /* mb-3 */
+       }
+       .translation-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+            border-left: 2px solid #3B82F6;
+            padding-left: 1rem;
+            margin-top: 0.75rem;
+        }
+       .person-toggle:checked + .toggle-switch {
+            background-color: #3B82F6;
+        }
+       .person-toggle:checked + .toggle-switch .toggle-dot {
+            transform: translateX(100%);
+        }
+        /* Custom scrollbar for better dark mode aesthetics */
+        .horizontal-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+        .horizontal-scroll::-webkit-scrollbar-track {
+            background: #1F2937;
+        }
+        .horizontal-scroll::-webkit-scrollbar-thumb {
+            background-color: #4B5563;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="sticky top-0 bg-gray-900/80 backdrop-blur-lg z-10 p-4 border-b border-gray-700">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-2xl font-bold text-center text-white">
+                <span class="text-blue-500">🧭</span> 以太坊罗盘
+            </h1>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 lg:p-6">
+        <div class="flex flex-col lg:grid lg:grid-cols-3 lg:gap-8">
+            
+            <!-- Main content column (order-2 on mobile, order-1 on desktop) -->
+            <div class="lg:col-span-2 order-2 lg:order-1">
+                <!-- Section: Unified Feed -->
+                <section id="unified-feed-section" class="mb-8 pt-8 lg:pt-0">
+                    <h2 class="section-title">统一信息流</h2>
+                    <div id="unified-feed">
+                        <div class="feed-card">
+                            <div class="flex items-center text-sm text-gray-400 mb-2">
+                                <span class="mr-2">📰</span>
+                                <span>CoinDesk · 5分钟前</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-100">Ethereum Surges to New All-Time High Amid Likely September Rate Cut</h3>
+                            <button class="text-blue-400 text-sm mt-3" onclick="toggleTranslation(this)">展开AI翻译与摘要 ▼</button>
+                            <div class="translation-content text-gray-300">
+                                <p class="font-semibold mt-2">【AI摘要】</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 mt-1">
+                                    <li>由于市场预期九月可能降息，以太坊价格飙升至历史新高。</li>
+                                    <li>大量空头头寸被清算，加剧了价格上涨的势头。</li>
+                                    <li>分析师认为，宏观经济环境的转变是推动此次上涨的关键因素。</li>
+                                </ul>
+                                <p class="font-semibold mt-3">【AI全文翻译】</p>
+                                <p class="text-sm mt-1">在市场对美联储可能于九月降息的预期日益增强的背景下，以太坊价格今日飙升，创下新的历史最高纪录。这一强劲上涨导致价值数亿美元的空头头寸被清算，进一步推动了价格的上涨。分析师指出，宏观经济环境的鸽派转向，加上以太坊生态系统内部的积极发展，共同为此次破纪录的涨势奠定了基础。交易员们正密切关注即将发布的经济数据，以寻找有关未来货币政策走向的更多线索... (此处为AI翻译内容节选)</p>
+                            </div>
+                        </div>
+
+                        <div class="feed-card">
+                            <div class="flex items-center text-sm text-gray-400 mb-3">
+                                <span class="mr-2">🐦</span>
+                                <span>Twitter/X · 25分钟前</span>
+                            </div>
+                            <div class="flex items-start">
+                                <img src="https://i.pravatar.cc/40?u=vitalik" class="w-10 h-10 rounded-full mr-3" alt="Vitalik Buterin">
+                                <div>
+                                    <p class="font-semibold text-white">Vitalik Buterin <span class="text-gray-400 font-normal">@VitalikButerin</span></p>
+                                    <p class="mt-1 text-gray-300">The transition to Proof-of-Stake was just the beginning. The next phase, "The Surge," will focus on scaling solutions like Danksharding, aiming for 100,000+ transactions per second. The future is scalable and secure.</p>
+                                </div>
+                            </div>
+                            <button class="text-blue-400 text-sm mt-3" onclick="toggleTranslation(this)">展开AI翻译 ▼</button>
+                            <div class="translation-content text-gray-300">
+                                <p class="font-semibold mt-2">【AI翻译】</p>
+                                <p class="text-sm mt-1">向权益证明（PoS）的过渡仅仅是个开始。下一阶段“The Surge”将专注于Danksharding等扩容解决方案，目标是实现每秒超过10万笔交易。未来是可扩展且安全的。</p>
+                            </div>
+                        </div>
+
+                        <div class="feed-card">
+                            <div class="flex items-center text-sm text-gray-400 mb-2">
+                                <span class="mr-2">📰</span>
+                                <span>深潮TechFlow · 1小时前</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-100">解析EIP-7702：V神新提案如何改变以太坊账户抽象格局</h3>
+                            <p class="text-sm text-gray-400 mt-2">Vitalik Buterin最新提出的EIP-7702旨在引入一种新的交易类型，允许外部拥有账户（EOA）在单次交易中临时化身为智能合约钱包，极大地提升了用户体验和灵活性...</p>
+                        </div>
+
+                        <div class="feed-card">
+                            <div class="flex items-center text-sm text-gray-400 mb-2">
+                                <span class="mr-2">🎙️</span>
+                                <span>Bankless 播客 · 3小时前</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-100">【AI摘要】与Arthur Hayes探讨宏观经济与ETH的未来</h3>
+                            <ul class="list-disc list-inside text-sm text-gray-300 space-y-1 mt-2">
+                                <li>宏观经济：全球流动性周期是影响加密资产价格的最关键因素。</li>
+                                <li>ETH定位：以太坊作为“去中心化互联网的债券”，其价值将通过质押收益和通缩机制得到体现。</li>
+                                <li>未来预测：随着ETF的普及和机构资金的流入，ETH有望在下一轮牛市中表现超越比特币。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Influencers -->
+                <section id="influencers-section" class="pt-6 border-t border-gray-700">
+                    <div class="flex justify-between items-center section-title">
+                        <h2 class="text-lg font-semibold text-gray-300">核心人物动态</h2>
+                        <button id="filter-btn" class="text-blue-400 text-sm">筛选 ▼</button>
+                    </div>
+                    <div id="filter-panel" class="hidden bg-gray-800 p-4 rounded-lg mb-4">
+                        <p class="font-semibold mb-2">选择要显示的人物：</p>
+                        <div class="space-y-2">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" data-person="vitalik" class="person-toggle hidden" checked>
+                                <span class="w-10 h-5 bg-gray-600 rounded-full flex items-center p-1 transition-colors toggle-switch">
+                                    <span class="w-4 h-4 bg-white rounded-full transform transition-transform toggle-dot"></span>
+                                </span>
+                                <span class="ml-3">Vitalik Buterin</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" data-person="tomlee" class="person-toggle hidden" checked>
+                                <span class="w-10 h-5 bg-gray-600 rounded-full flex items-center p-1 transition-colors toggle-switch">
+                                    <span class="w-4 h-4 bg-white rounded-full transform transition-transform toggle-dot"></span>
+                                </span>
+                                <span class="ml-3">Tom Lee</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" data-person="arthur" class="person-toggle hidden">
+                                 <span class="w-10 h-5 bg-gray-600 rounded-full flex items-center p-1 transition-colors toggle-switch">
+                                    <span class="w-4 h-4 bg-white rounded-full transform transition-transform toggle-dot"></span>
+                                </span>
+                                <span class="ml-3">Arthur Hayes</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div id="influencers-feed">
+                        <div class="feed-card person-vitalik">
+                            <div class="flex items-center text-sm text-gray-400 mb-3"><span class="mr-2">🐦</span><span>Twitter/X · 25分钟前</span></div>
+                            <div class="flex items-start">
+                                <img src="https://i.pravatar.cc/40?u=vitalik" class="w-10 h-10 rounded-full mr-3" alt="Vitalik Buterin">
+                                <div>
+                                    <p class="font-semibold text-white">Vitalik Buterin <span class="text-gray-400 font-normal">@VitalikButerin</span></p>
+                                    <p class="mt-1 text-gray-300">The transition to Proof-of-Stake was just the beginning...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="feed-card person-tomlee">
+                            <div class="flex items-center text-sm text-gray-400 mb-3"><span class="mr-2">📺</span><span>CNBC 访谈 · 8小时前</span></div>
+                            <div class="flex items-start">
+                                <img src="https://i.pravatar.cc/40?u=tomlee" class="w-10 h-10 rounded-full mr-3" alt="Tom Lee">
+                                <div>
+                                    <p class="font-semibold text-white">Tom Lee <span class="text-gray-400 font-normal">@fundstrat</span></p>
+                                    <p class="mt-1 text-gray-300">【AI摘要】我们仍然看好以太坊。现货ETF的批准为机构投资者打开了大门，预计未来12个月内将有大量资金流入，ETH价格目标维持在$10,000。</p>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="feed-card person-arthur hidden">
+                            <div class="flex items-center text-sm text-gray-400 mb-3"><span class="mr-2">🎙️</span><span>Bankless 播客 · 3小时前</span></div>
+                            <div class="flex items-start">
+                                <img src="https://i.pravatar.cc/40?u=arthur" class="w-10 h-10 rounded-full mr-3" alt="Arthur Hayes">
+                                <div>
+                                    <p class="font-semibold text-white">Arthur Hayes</p>
+                                    <p class="mt-1 text-gray-300">【AI摘要】全球流动性周期是影响加密资产价格的最关键因素...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Sidebar column (order-1 on mobile, order-2 on desktop) -->
+            <div class="lg:col-span-1 space-y-8 order-1 lg:order-2">
+                <!-- Section: Data Dashboard -->
+                <section id="data-dashboard">
+                    <h2 class="section-title">关键数据看板</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="data-card">
+                            <p class="text-sm text-gray-400">ETH/USD 价格</p>
+                            <p class="text-2xl font-bold text-green-400">$4,642.23</p>
+                            <p class="text-sm text-green-400">+10.04%</p>
+                        </div>
+                        <div class="data-card">
+                            <p class="text-sm text-gray-400">ETH/BTC 汇率</p>
+                            <p class="text-2xl font-bold text-white">0.040</p>
+                            <p class="text-sm text-red-400">-1.2%</p>
+                        </div>
+                        <div class="data-card">
+                            <p class="text-sm text-gray-400">24小时交易量</p>
+                            <p class="text-xl font-bold text-white">$53.66B</p>
+                            <p class="text-sm text-gray-400">占总额 26.73%</p>
+                        </div>
+                        <div class="data-card">
+                            <p class="text-sm text-gray-400">主网 Gas 费</p>
+                            <p class="text-2xl font-bold text-white">12</p>
+                            <p class="text-sm text-gray-400">Gwei</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Treasuries -->
+                <section id="treasuries-section" class="pt-6 border-t border-gray-700">
+                    <h2 class="section-title">ETH Treasury 公司追踪</h2>
+                    <div class="feed-card overflow-x-auto horizontal-scroll">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="text-gray-400 border-b border-gray-600">
+                                <tr>
+                                    <th class="py-2 px-3">公司</th>
+                                    <th class="py-2 px-3">持仓量 (ETH)</th>
+                                    <th class="py-2 px-3">价值 (USD)</th>
+                                    <th class="py-2 px-3">股价</th>
+                                    <th class="py-2 px-3">市值</th>
+                                    <th class="py-2 px-3">mNAV</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-700">
+                                <tr>
+                                    <td class="py-3 px-3 font-medium">Bitmine Immersion (MNEE)</td>
+                                    <td class="py-3 px-3">1,070,000</td>
+                                    <td class="py-3 px-3">$4.96B</td>
+                                    <td class="py-3 px-3">$12.50</td>
+                                    <td class="py-3 px-3">$1.2B</td>
+                                    <td class="py-3 px-3 text-green-400">413%</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-3 font-medium">SharpLink Gaming (SBET)</td>
+                                    <td class="py-3 px-3">143,593</td>
+                                    <td class="py-3 px-3">$667M</td>
+                                    <td class="py-3 px-3">$0.88</td>
+                                    <td class="py-3 px-3">$15M</td>
+                                    <td class="py-3 px-3 text-green-400">4446%</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-3 font-medium">Metaplanet (JPX: 3350)</td>
+                                    <td class="py-3 px-3">15,555</td>
+                                    <td class="py-3 px-3">$72M</td>
+                                    <td class="py-3 px-3">¥92</td>
+                                    <td class="py-3 px-3">$60M</td>
+                                    <td class="py-3 px-3 text-green-400">120%</td>
+                                </tr>
+                                 <tr>
+                                    <td class="py-3 px-3 font-medium">Coinbase (COIN)</td>
+                                    <td class="py-3 px-3">12,000</td>
+                                    <td class="py-3 px-3">$55M</td>
+                                    <td class="py-3 px-3">$245.7</td>
+                                    <td class="py-3 px-3">$58.4B</td>
+                                    <td class="py-3 px-3 text-gray-400">0.09%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                     <div class="feed-card">
+                        <div class="flex items-center text-sm text-gray-400 mb-2">
+                            <span class="mr-2">📰</span>
+                            <span>Decrypt · 1天前</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-100">Public Keys: Ethereum Treasuries Soar, Bitcoin ETFs' $1 Billion Bleed</h3>
+                        <p class="text-sm text-gray-400 mt-2">本周，持有ETH作为储备资产的公司数量显著增加，其中Bitmine的持仓价值已接近50亿美元，显示出企业对以太坊作为价值储存手段的信心日益增强...</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleTranslation(button) {
+            const content = button.nextElementSibling;
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                button.textContent = button.textContent.replace('收起', '展开').replace('▲', '▼');
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+                button.textContent = button.textContent.replace('展开', '收起').replace('▼', '▲');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Influencer filter logic
+            const filterBtn = document.getElementById('filter-btn');
+            const filterPanel = document.getElementById('filter-panel');
+            const personToggles = document.querySelectorAll('.person-toggle');
+
+            filterBtn.addEventListener('click', () => {
+                filterPanel.classList.toggle('hidden');
+            });
+
+            const updateInfluencerFeed = () => {
+                personToggles.forEach(toggle => {
+                    const person = toggle.dataset.person;
+                    const cards = document.querySelectorAll(`.person-${person}`);
+                    cards.forEach(card => {
+                        card.classList.toggle('hidden', !toggle.checked);
+                    });
+                });
+            };
+
+            personToggles.forEach(toggle => {
+                toggle.addEventListener('change', updateInfluencerFeed);
+            });
+
+            // Initial run to set the correct state on page load
+            updateInfluencerFeed();
+        });
+    </script>
+
+</body>
+</html>
