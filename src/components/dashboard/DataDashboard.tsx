@@ -3,7 +3,7 @@ import DataCard from './DataCard';
 export default function DataDashboard() {
   return (
     <section id="data-dashboard">
-      <h2 className="text-lg font-semibold text-gray-300 mb-3">关键数据看板</h2>
+      <h2 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-title)' }}>关键数据看板</h2>
       <div className="grid grid-cols-2 gap-3">
         <DataCard
           label="ETH/USD 价格"

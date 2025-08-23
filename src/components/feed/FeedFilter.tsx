@@ -71,10 +71,11 @@ export default function FeedFilter({ onFilterChange }: FeedFilterProps) {
   return (
     <>
       <div className="flex justify-between items-center mb-3">
-        <h2 className="text-lg font-semibold text-gray-300">统一信息流</h2>
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--text-title)' }}>统一信息流</h2>
         <button
           onClick={() => setShowFilter(!showFilter)}
-          className="flex items-center text-blue-400 text-sm bg-gray-800 px-3 py-1 rounded-md hover:bg-gray-700 transition"
+          className="flex items-center text-blue-400 text-sm px-3 py-1 rounded-md hover:opacity-80 transition"
+          style={{ backgroundColor: 'var(--bg-card)' }}
         >
           <svg 
             className="w-4 h-4 mr-2" 
@@ -95,10 +96,10 @@ export default function FeedFilter({ onFilterChange }: FeedFilterProps) {
       </div>
 
       {showFilter && (
-        <div className="bg-gray-800 p-4 rounded-lg mb-4 border border-gray-700">
+        <div className="p-4 rounded-lg mb-4" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <h4 className="font-semibold mb-2 text-gray-300">信息来源</h4>
+              <h4 className="font-semibold mb-2" style={{ color: 'var(--text-title)' }}>信息来源</h4>
               <div className="space-y-1">
                 {filterOptions.source.map(option => (
                   <label key={option.value} className="flex items-center cursor-pointer">
@@ -106,16 +107,17 @@ export default function FeedFilter({ onFilterChange }: FeedFilterProps) {
                       type="checkbox"
                       checked={filters.source.includes(option.value)}
                       onChange={() => toggleFilter('source', option.value)}
-                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2"
+                      style={{ backgroundColor: 'var(--bg-main)', borderColor: 'var(--border-color)' }}
                     />
-                    <span className="ml-2 text-gray-300 text-sm">{option.label}</span>
+                    <span className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>{option.label}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-2 text-gray-300">信息类型</h4>
+              <h4 className="font-semibold mb-2" style={{ color: 'var(--text-title)' }}>信息类型</h4>
               <div className="space-y-1">
                 {filterOptions.type.map(option => (
                   <label key={option.value} className="flex items-center cursor-pointer">
@@ -123,16 +125,17 @@ export default function FeedFilter({ onFilterChange }: FeedFilterProps) {
                       type="checkbox"
                       checked={filters.type.includes(option.value)}
                       onChange={() => toggleFilter('type', option.value)}
-                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2"
+                      style={{ backgroundColor: 'var(--bg-main)', borderColor: 'var(--border-color)' }}
                     />
-                    <span className="ml-2 text-gray-300 text-sm">{option.label}</span>
+                    <span className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>{option.label}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-2 text-gray-300">重要性</h4>
+              <h4 className="font-semibold mb-2" style={{ color: 'var(--text-title)' }}>重要性</h4>
               <div className="space-y-1">
                 {filterOptions.importance.map(option => (
                   <label key={option.value} className="flex items-center cursor-pointer">
@@ -140,9 +143,10 @@ export default function FeedFilter({ onFilterChange }: FeedFilterProps) {
                       type="checkbox"
                       checked={filters.importance.includes(option.value)}
                       onChange={() => toggleFilter('importance', option.value)}
-                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2"
+                      style={{ backgroundColor: 'var(--bg-main)', borderColor: 'var(--border-color)' }}
                     />
-                    <span className="ml-2 text-gray-300 text-sm">{option.label}</span>
+                    <span className="ml-2 text-sm" style={{ color: 'var(--text-primary)' }}>{option.label}</span>
                   </label>
                 ))}
               </div>
@@ -152,7 +156,8 @@ export default function FeedFilter({ onFilterChange }: FeedFilterProps) {
           <div className="mt-4 text-right">
             <button
               onClick={resetFilters}
-              className="text-gray-400 text-sm hover:text-white mr-4"
+              className="text-sm hover:opacity-80 mr-4"
+              style={{ color: 'var(--text-secondary)' }}
             >
               重置筛选
             </button>

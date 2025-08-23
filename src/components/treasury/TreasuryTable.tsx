@@ -56,12 +56,18 @@ const treasuryData: TreasuryCompany[] = [
 
 export default function TreasuryTable() {
   return (
-    <section id="treasuries-section" className="pt-6 border-t border-gray-700">
-      <h2 className="text-lg font-semibold text-gray-300 mb-3">ETH Treasury 公司追踪</h2>
+    <section id="treasuries-section" className="pt-6 border-t" style={{ borderColor: 'var(--border-color)' }}>
+      <h2 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-title)' }}>ETH Treasury 公司追踪</h2>
       
-      <div className="bg-[#1F2937] rounded-xl p-5 border border-[#374151] overflow-x-auto horizontal-scroll mb-4">
+      <div 
+        className="rounded-xl p-5 border overflow-x-auto horizontal-scroll mb-4 transition-colors"
+        style={{ 
+          backgroundColor: 'var(--bg-card)', 
+          borderColor: 'var(--border-color)' 
+        }}
+      >
         <table className="w-full text-left text-sm whitespace-nowrap">
-          <thead className="text-gray-400 border-b border-gray-600">
+          <thead className="border-b" style={{ color: 'var(--text-secondary)', borderColor: 'var(--border-color)' }}>
             <tr>
               <th className="py-2 px-3">公司</th>
               <th className="py-2 px-3">持仓量 (ETH)</th>
@@ -71,19 +77,20 @@ export default function TreasuryTable() {
               <th className="py-2 px-3">mNAV</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-700">
+          <tbody className="divide-y" style={{ borderColor: 'var(--border-color)' }}>
             {treasuryData.map((company, index) => (
               <tr key={index}>
-                <td className="py-3 px-3 font-medium">
+                <td className="py-3 px-3 font-medium" style={{ color: 'var(--text-primary)' }}>
                   {company.name} ({company.ticker})
                 </td>
-                <td className="py-3 px-3">{company.holdings}</td>
-                <td className="py-3 px-3">{company.value}</td>
-                <td className="py-3 px-3">{company.stockPrice}</td>
-                <td className="py-3 px-3">{company.marketCap}</td>
+                <td className="py-3 px-3" style={{ color: 'var(--text-primary)' }}>{company.holdings}</td>
+                <td className="py-3 px-3" style={{ color: 'var(--text-primary)' }}>{company.value}</td>
+                <td className="py-3 px-3" style={{ color: 'var(--text-primary)' }}>{company.stockPrice}</td>
+                <td className="py-3 px-3" style={{ color: 'var(--text-primary)' }}>{company.marketCap}</td>
                 <td className={`py-3 px-3 ${
-                  company.mNAVColor === 'green' ? 'text-green-400' : 'text-gray-400'
-                }`}>
+                  company.mNAVColor === 'green' ? 'text-green-400' : ''
+                }`}
+                style={company.mNAVColor !== 'green' ? { color: 'var(--text-secondary)' } : undefined}>
                   {company.mNAV}
                 </td>
               </tr>

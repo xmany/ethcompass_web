@@ -74,9 +74,9 @@ export default function InfluencerFeed() {
   );
 
   return (
-    <section id="influencers-section" className="pt-6 border-t border-gray-700">
+    <section id="influencers-section" className="pt-6 border-t" style={{ borderColor: 'var(--border-color)' }}>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-300">核心人物动态</h2>
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--text-title)' }}>核心人物动态</h2>
         <button
           onClick={() => setShowFilter(!showFilter)}
           className="text-blue-400 text-sm hover:text-blue-300 transition-colors"
@@ -86,8 +86,14 @@ export default function InfluencerFeed() {
       </div>
 
       {showFilter && (
-        <div className="bg-[#1F2937] p-4 rounded-lg mb-4 border border-[#374151]">
-          <p className="font-semibold mb-3 text-gray-200">选择要显示的人物：</p>
+        <div 
+          className="p-4 rounded-lg mb-4 border transition-colors"
+          style={{ 
+            backgroundColor: 'var(--bg-card)', 
+            borderColor: 'var(--border-color)' 
+          }}
+        >
+          <p className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>选择要显示的人物：</p>
           <div className="space-y-3">
             {influencerData.map(inf => (
               <label key={inf.id} className="flex items-center cursor-pointer">
@@ -102,7 +108,7 @@ export default function InfluencerFeed() {
                     <div className="toggle-dot"></div>
                   </div>
                 </div>
-                <span className="ml-3 text-gray-300">{inf.name}</span>
+                <span className="ml-3" style={{ color: 'var(--text-primary)' }}>{inf.name}</span>
               </label>
             ))}
           </div>
@@ -111,8 +117,15 @@ export default function InfluencerFeed() {
 
       <div id="influencers-feed">
         {filteredInfluencers.map(inf => (
-          <div key={inf.id} className="bg-[#1F2937] rounded-xl p-6 border border-[#374151] mb-4">
-            <div className="flex items-center text-sm text-gray-400 mb-3">
+          <div 
+            key={inf.id} 
+            className="rounded-xl p-6 border mb-4 transition-colors"
+            style={{ 
+              backgroundColor: 'var(--bg-card)', 
+              borderColor: 'var(--border-color)' 
+            }}
+          >
+            <div className="flex items-center text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
               <span className="mr-2">{typeIcons[inf.type]}</span>
               <span>{inf.source} · {inf.timeAgo}</span>
             </div>
@@ -127,15 +140,15 @@ export default function InfluencerFeed() {
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-base font-semibold text-white">
+                <p className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
                   {inf.name}
                   {inf.handle && (
-                    <span className="text-gray-400 font-normal ml-1">
+                    <span className="font-normal ml-1" style={{ color: 'var(--text-secondary)' }}>
                       {inf.handle}
                     </span>
                   )}
                 </p>
-                <p className="mt-2 text-gray-300 text-[15px] leading-relaxed">{inf.content}</p>
+                <p className="mt-2 text-[15px] leading-relaxed" style={{ color: 'var(--text-primary)' }}>{inf.content}</p>
               </div>
             </div>
           </div>

@@ -2,12 +2,49 @@
 
 :root {
   --font-noto-sans-sc: 'Noto Sans SC', sans-serif;
+  
+  /* Dark theme (default) */
+  --bg-main: #111827;
+  --bg-card: #1F2937;
+  --bg-header: rgba(17, 24, 39, 0.8);
+  --text-primary: #E5E7EB;
+  --text-secondary: #9CA3AF;
+  --text-title: #D1D5DB;
+  --border-color: #374151;
+  --tag-red-bg: #991B1B;
+  --tag-red-text: #FEE2E2;
+  --tag-blue-bg: #1E40AF;
+  --tag-blue-text: #DBEAFE;
+  --tag-green-bg: #065F46;
+  --tag-green-text: #D1FAE5;
+  --tag-yellow-bg: #92400E;
+  --tag-yellow-text: #FEF3C7;
+}
+
+html.light {
+  /* Light theme */
+  --bg-main: #F9FAFB;
+  --bg-card: #FFFFFF;
+  --bg-header: rgba(255, 255, 255, 0.8);
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --text-title: #374151;
+  --border-color: #E5E7EB;
+  --tag-red-bg: #FEE2E2;
+  --tag-red-text: #991B1B;
+  --tag-blue-bg: #DBEAFE;
+  --tag-blue-text: #1E40AF;
+  --tag-green-bg: #D1FAE5;
+  --tag-green-text: #065F46;
+  --tag-yellow-bg: #FEF3C7;
+  --tag-yellow-text: #92400E;
 }
 
 body {
   font-family: var(--font-noto-sans-sc);
-  background-color: #111827;
-  color: #E5E7EB;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Custom scrollbar for better dark mode aesthetics */
@@ -75,4 +112,10 @@ body {
 
 .toggle-switch.active .toggle-dot {
   transform: translateX(1.25rem);
+}
+
+/* Table divider colors for theme support */
+.divide-y > * + * {
+  border-top-width: 1px;
+  border-color: var(--border-color);
 }

@@ -14,13 +14,21 @@ export default function DataCard({ label, value, change, changeColor = 'gray', s
   }[changeColor];
 
   return (
-    <div className="bg-[#1F2937] rounded-xl p-4 border border-[#374151]">
-      <p className="text-sm text-gray-400">{label}</p>
-      <p className={`text-2xl font-bold ${changeColor === 'green' ? 'text-green-400' : 'text-white'}`}>
+    <div 
+      className="rounded-xl p-4 border transition-colors"
+      style={{ 
+        backgroundColor: 'var(--bg-card)', 
+        borderColor: 'var(--border-color)' 
+      }}
+    >
+      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{label}</p>
+      <p className={`text-2xl font-bold ${changeColor === 'green' ? 'text-green-400' : ''}`}
+         style={changeColor !== 'green' ? { color: 'var(--text-primary)' } : undefined}>
         {value}
       </p>
       {(change || suffix) && (
-        <p className={`text-sm ${change ? changeColorClass : 'text-gray-400'}`}>
+        <p className={`text-sm ${change ? changeColorClass : ''}`}
+           style={!change ? { color: 'var(--text-secondary)' } : undefined}>
           {change || suffix}
         </p>
       )}

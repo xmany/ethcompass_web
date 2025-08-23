@@ -65,12 +65,16 @@ export default function FeedCard({
 
   return (
     <div 
-      className="bg-[#1F2937] rounded-xl p-6 border border-[#374151] mb-4"
+      className="rounded-xl p-6 border mb-4 transition-colors"
+      style={{ 
+        backgroundColor: 'var(--bg-card)', 
+        borderColor: 'var(--border-color)' 
+      }}
       data-source={sourceKey}
       data-type={category}
       data-importance={importance}
     >
-      <div className="flex items-center justify-between text-sm text-gray-400 mb-3">
+      <div className="flex items-center justify-between text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
         <div className="flex items-center">
           <span className="mr-2">{typeIcons[type]}</span>
           <span>{source} · {timeAgo}</span>
@@ -105,25 +109,25 @@ export default function FeedCard({
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className="text-base font-semibold text-white">
+            <p className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
               {author.name}
               {author.handle && (
-                <span className="text-gray-400 font-normal ml-1">
+                <span className="font-normal ml-1" style={{ color: 'var(--text-secondary)' }}>
                   {author.handle}
                 </span>
               )}
             </p>
-            {content && <p className="mt-2 text-gray-300 text-[15px] leading-relaxed">{content}</p>}
+            {content && <p className="mt-2 text-[15px] leading-relaxed" style={{ color: 'var(--text-primary)' }}>{content}</p>}
           </div>
         </div>
       )}
 
       {title && !author && (
-        <h3 className="text-lg font-semibold text-gray-100 mb-3">{title}</h3>
+        <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>{title}</h3>
       )}
 
       {summary && (
-        <div className="text-[15px] text-gray-400 mt-3 leading-relaxed">
+        <div className="text-[15px] mt-3 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
           {summary.split('\n').map((line, index) => (
             <p key={index} className={index > 0 ? 'mt-2' : ''}>
               {line}
@@ -145,8 +149,8 @@ export default function FeedCard({
             <div>
               {translation.summary && (
                 <>
-                  <p className="font-semibold mt-3 text-gray-200">【AI摘要】</p>
-                  <ul className="list-disc list-inside text-[15px] space-y-2 mt-2 text-gray-300 leading-relaxed">
+                  <p className="font-semibold mt-3" style={{ color: 'var(--text-primary)' }}>【AI摘要】</p>
+                  <ul className="list-disc list-inside text-[15px] space-y-2 mt-2 leading-relaxed" style={{ color: 'var(--text-primary)' }}>
                     {translation.summary.map((item, index) => (
                       <li key={index}>{item}</li>
                     ))}
@@ -156,8 +160,8 @@ export default function FeedCard({
               
               {translation.fullText && (
                 <>
-                  <p className="font-semibold mt-4 text-gray-200">【AI全文翻译】</p>
-                  <p className="text-[15px] mt-2 text-gray-300 leading-relaxed">{translation.fullText}</p>
+                  <p className="font-semibold mt-4" style={{ color: 'var(--text-primary)' }}>【AI全文翻译】</p>
+                  <p className="text-[15px] mt-2 leading-relaxed" style={{ color: 'var(--text-primary)' }}>{translation.fullText}</p>
                 </>
               )}
             </div>
