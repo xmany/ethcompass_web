@@ -1,26 +1,69 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-noto-sans-sc: 'Noto Sans SC', sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-noto-sans-sc);
+  background-color: #111827;
+  color: #E5E7EB;
+}
+
+/* Custom scrollbar for better dark mode aesthetics */
+.horizontal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-track {
+  background: #1F2937;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+  background-color: #4B5563;
+  border-radius: 20px;
+}
+
+/* Transition for translation content */
+.translation-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-in-out;
+  border-left: 2px solid #3B82F6;
+  padding-left: 1rem;
+  margin-top: 0.75rem;
+}
+
+.translation-content.expanded {
+  max-height: 1000px;
+}
+
+/* Toggle switch styles */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 2.5rem;
+  height: 1.25rem;
+  background-color: #4B5563;
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+}
+
+.toggle-switch.active {
+  background-color: #3B82F6;
+}
+
+.toggle-dot {
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  background-color: white;
+  border-radius: 50%;
+  top: 0.125rem;
+  left: 0.125rem;
+  transition: transform 0.3s;
+}
+
+.toggle-switch.active .toggle-dot {
+  transform: translateX(1.25rem);
 }
