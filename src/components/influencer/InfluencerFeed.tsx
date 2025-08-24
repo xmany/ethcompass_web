@@ -62,7 +62,7 @@ export default function InfluencerFeed() {
         <h2 className="text-lg font-semibold" style={{ color: 'var(--text-title)' }}>核心人物动态</h2>
         <button
           onClick={() => setShowFilter(!showFilter)}
-          className="text-blue-400 text-sm hover:text-blue-300 transition-colors"
+          className="text-blue-400 text-sm hover:text-blue-300 transition-colors cursor-pointer"
         >
           筛选 {showFilter ? '▲' : '▼'}
         </button>

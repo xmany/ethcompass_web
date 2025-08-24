@@ -139,7 +139,7 @@ export default function FeedCard({
       {translation && (
         <>
           <button
-            className="text-blue-400 text-sm mt-4 hover:text-blue-300 transition-colors"
+            className="text-blue-400 text-sm mt-4 hover:text-blue-300 transition-colors cursor-pointer"
             onClick={toggleTranslation}
           >
             {showTranslation ? '收起AI翻译' : '展开AI翻译'} {showTranslation ? '▲' : '▼'}
