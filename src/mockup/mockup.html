@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>以太坊罗盘 - MVP UI (自适应版)</title>
+    <title>以太坊罗盘 - 数据可视化仪表盘</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -17,14 +21,6 @@
             --text-secondary: #9CA3AF;
             --text-title: #D1D5DB;
             --border-color: #374151;
-            --tag-red-bg: #991B1B;
-            --tag-red-text: #FEE2E2;
-            --tag-blue-bg: #1E40AF;
-            --tag-blue-text: #DBEAFE;
-            --tag-green-bg: #065F46;
-            --tag-green-text: #D1FAE5;
-            --tag-yellow-bg: #92400E;
-            --tag-yellow-text: #FEF3C7;
         }
 
         html.light {
@@ -35,326 +31,189 @@
             --text-secondary: #6B7280;
             --text-title: #374151;
             --border-color: #E5E7EB;
-            --tag-red-bg: #FEE2E2;
-            --tag-red-text: #991B1B;
-            --tag-blue-bg: #DBEAFE;
-            --tag-blue-text: #1E40AF;
-            --tag-green-bg: #D1FAE5;
-            --tag-green-text: #065F46;
-            --tag-yellow-bg: #FEF3C7;
-            --tag-yellow-text: #92400E;
         }
 
         body {
             font-family: 'Noto Sans SC', sans-serif;
             background-color: var(--bg-main);
             color: var(--text-primary);
+            scroll-behavior: smooth;
         }
-       .data-card {
+        .dashboard-card {
             background-color: var(--bg-card);
             border-radius: 0.75rem;
-            padding: 1rem;
+            padding: 1.5rem;
             border: 1px solid var(--border-color);
         }
-       .feed-card {
-            background-color: var(--bg-card);
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            border: 1px solid var(--border-color);
-            margin-bottom: 1rem;
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
         }
-       .section-title {
-            font-size: 1.125rem; /* text-lg */
-            font-weight: 600; /* font-semibold */
-            color: var(--text-title);
-            margin-bottom: 0.75rem; /* mb-3 */
-       }
-       .translation-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-in-out;
-            border-left: 2px solid #3B82F6;
-            padding-left: 1rem;
-            margin-top: 0.75rem;
-        }
-       .person-toggle:checked + .toggle-switch {
-            background-color: #3B82F6;
-        }
-       .person-toggle:checked + .toggle-switch .toggle-dot {
-            transform: translateX(100%);
-        }
-        /* Custom scrollbar for better dark mode aesthetics */
-        .horizontal-scroll::-webkit-scrollbar {
-            height: 6px;
-        }
-        .horizontal-scroll::-webkit-scrollbar-track {
-            background: var(--bg-card);
-        }
-        .horizontal-scroll::-webkit-scrollbar-thumb {
-            background-color: #4B5563;
-            border-radius: 20px;
-        }
-        .tag {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-right: 0.5rem;
-        }
-        .tag-blue { background-color: var(--tag-blue-bg); color: var(--tag-blue-text); }
-        .tag-green { background-color: var(--tag-green-bg); color: var(--tag-green-text); }
-        .tag-red { background-color: var(--tag-red-bg); color: var(--tag-red-text); }
-        .tag-yellow { background-color: var(--tag-yellow-bg); color: var(--tag-yellow-text); }
-        .filter-checkbox:checked {
-            background-color: #3B82F6;
-            border-color: #3B82F6;
-        }
+        .horizontal-scroll::-webkit-scrollbar { height: 6px; }
+        .horizontal-scroll::-webkit-scrollbar-track { background: var(--bg-card); }
+        .horizontal-scroll::-webkit-scrollbar-thumb { background-color: #4B5563; border-radius: 20px; }
     </style>
 </head>
 <body>
 
     <header class="sticky top-0 backdrop-blur-lg z-10 p-4 border-b" style="background-color: var(--bg-header); border-color: var(--border-color);">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="w-8"></div> <!-- Spacer -->
+             <div class="w-8"></div> <!-- Spacer -->
             <h1 class="text-2xl font-bold text-center" style="color: var(--text-primary);">
                 <span class="text-blue-500">🧭</span> 以太坊罗盘
             </h1>
             <button id="theme-toggle-btn" class="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2" style="color: var(--text-secondary); --tw-ring-offset-color: var(--bg-main); --tw-ring-color: #3B82F6;">
-                <svg id="theme-toggle-sun-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                <svg id="theme-toggle-moon-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
+                <svg id="theme-toggle-sun-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                <svg id="theme-toggle-moon-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
             </button>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto p-4 lg:p-6">
-        <div class="flex flex-col lg:grid lg:grid-cols-3 lg:gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- Main content column (order-2 on mobile, order-1 on desktop) -->
-            <div class="lg:col-span-2 order-2 lg:order-1">
-                <!-- Section: Unified Feed -->
-                <section id="unified-feed-section" class="mb-8 pt-8 lg:pt-0">
-                    <div class="flex justify-between items-center mb-3">
-                        <h2 class="section-title mb-0">统一信息流</h2>
-                        <button id="feed-filter-btn" class="flex items-center text-blue-400 text-sm px-3 py-1 rounded-md hover:opacity-80 transition" style="background-color: var(--bg-card);">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                            筛选信息
-                        </button>
+            <!-- Main Column -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- 1. Price & Volume -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH 价格 & 交易量 (日线)</h2>
+                    <div class="chart-container" style="height: 400px;">
+                        <canvas id="priceVolumeChart"></canvas>
                     </div>
-                    <!-- Feed Filter Panel -->
-                    <div id="feed-filter-panel" class="hidden p-4 rounded-lg mb-4" style="background-color: var(--bg-card);">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <h4 class="font-semibold mb-2" style="color: var(--text-title);">信息来源</h4>
-                                <div class="space-y-1">
-                                    <label class="flex items-center"><input type="checkbox" data-filter-group="source" value="coindesk" class="filter-checkbox rounded mr-2" style="background-color: var(--bg-main); border-color: var(--border-color);" checked> CoinDesk</label>
-                                    <label class="flex items-center"><input type="checkbox" data-filter-group="source" value="twitter" class="filter-checkbox rounded mr-2" style="background-color: var(--bg-main); border-color: var(--border-color);" checked> Twitter/X</label>
-                                    <label class="flex items-center"><input type="checkbox" data-filter-group="source" value="bankless" class="filter-checkbox rounded mr-2" style="background-color: var(--bg-main); border-color: var(--border-color);" checked> Bankless</label>
-                                    <label class="flex items-center"><input type="checkbox" data-filter-group="source" value="techflow" class="filter-checkbox rounded mr-2" style="background-color: var(--bg-main); border-color: var(--border-color);" checked> 深潮TechFlow</label>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold mb-2" style="color: var(--text-title);">信息类型</h4>
-                                <div class="space-y-1">
-                                    <label class="flex items-center"><input type="checkbox" data-filter-group="type" value="news" class="filter-checkbox rounded mr-2" style="background-color: var(--bg-main); border-color: var(--border-color);" checked> 新闻</label>
-                                    <label class="flex items-center"><input type="checkbox" data-filter-group="type" value="analysis" class="filter-checkbox rounded mr-2" style="background-color: var(--bg-main); border-color: var(--border-color);" checked> 深度分析</label>
-                                    <label class="flex items-center"><input type="checkbox" data-filter-group="type" value="rumor" class="filter-checkbox rounded mr-2" style="background-color: var(--bg-main); border-color: var(--border-color);" checked> 市场传闻</label>
-                                    <label class="flex items-center"><input type="checkbox" data-filter-group="type" value="alert" class="filter-checkbox rounded mr-2" style="background-color: var(--bg-main); border-color: var(--border-color);" checked> 价格预警</label>
-                                </div>
-                            </div>
-                             <div>
-                                <h4 class="font-semibold mb-2" style="color: var(--text-title);">重要性</h4>
-                                <div class="space-y-1">
-                                    <label class="flex items-center"><input type="checkbox" data-filter-group="importance" value="high" class="filter-checkbox rounded mr-2" style="background-color: var(--bg-main); border-color: var(--border-color);" checked> 高</label>
-                                    <label class="flex items-center"><input type="checkbox" data-filter-group="importance" value="medium" class="filter-checkbox rounded mr-2" style="background-color: var(--bg-main); border-color: var(--border-color);" checked> 中</label>
-                                    <label class="flex items-center"><input type="checkbox" data-filter-group="importance" value="low" class="filter-checkbox rounded mr-2" style="background-color: var(--bg-main); border-color: var(--border-color);" checked> 低</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-4 text-right">
-                             <button id="reset-filters-btn" class="text-sm hover:opacity-80 mr-4" style="color: var(--text-secondary);">重置筛选</button>
-                             <button id="apply-filters-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">应用</button>
-                        </div>
-                    </div>
-                    <div id="unified-feed">
-                        <div class="feed-card" data-source="coindesk" data-type="news" data-importance="high">
-                            <div class="flex items-center justify-between text-sm mb-2" style="color: var(--text-secondary);">
-                                <div class="flex items-center"><span class="mr-2">📰</span><span>CoinDesk · 5分钟前</span></div>
-                                <div class="flex items-center">
-                                    <span class="tag tag-red">高重要性</span>
-                                    <span class="tag tag-blue">新闻</span>
-                                </div>
-                            </div>
-                            <h3 class="text-lg font-semibold" style="color: var(--text-primary);">Ethereum Surges to New All-Time High Amid Likely September Rate Cut</h3>
-                            <button class="text-blue-400 text-sm mt-3" onclick="toggleTranslation(this)">展开AI翻译与摘要 ▼</button>
-                            <div class="translation-content" style="color: var(--text-primary);">
-                                <p class="font-semibold mt-2">【AI摘要】</p>
-                                <ul class="list-disc list-inside text-sm space-y-1 mt-1">
-                                    <li>由于市场预期九月可能降息，以太坊价格飙升至历史新高。</li>
-                                    <li>大量空头头寸被清算，加剧了价格上涨的势头。</li>
-                                    <li>分析师认为，宏观经济环境的转变是推动此次上涨的关键因素。</li>
-                                </ul>
-                                <p class="font-semibold mt-3">【AI全文翻译】</p>
-                                <p class="text-sm mt-1">在市场对美联储可能于九月降息的预期日益增强的背景下，以太坊价格今日飙升，创下新的历史最高纪录。这一强劲上涨导致价值数亿美元的空头头寸被清算，进一步推动了价格的上涨。分析师指出，宏观经济环境的鸽派转向，加上以太坊生态系统内部的积极发展，共同为此次破纪录的涨势奠定了基础。交易员们正密切关注即将发布的经济数据，以寻找有关未来货币政策走向的更多线索... (此处为AI翻译内容节选)</p>
-                            </div>
-                        </div>
+                </div>
 
-                        <div class="feed-card" data-source="twitter" data-type="analysis" data-importance="medium">
-                             <div class="flex items-center justify-between text-sm mb-3" style="color: var(--text-secondary);">
-                                <div class="flex items-center"><span class="mr-2">🐦</span><span>Twitter/X · 25分钟前</span></div>
-                                <div class="flex items-center">
-                                    <span class="tag tag-yellow">中重要性</span>
-                                    <span class="tag tag-green">深度分析</span>
-                                </div>
-                            </div>
-                            <div class="flex items-start">
-                                <img src="https://i.pravatar.cc/40?u=vitalik" class="w-10 h-10 rounded-full mr-3" alt="Vitalik Buterin">
-                                <div>
-                                    <p class="font-semibold" style="color: var(--text-primary);">Vitalik Buterin <span class="font-normal" style="color: var(--text-secondary);">@VitalikButerin</span></p>
-                                    <p class="mt-1" style="color: var(--text-primary);">The transition to Proof-of-Stake was just the beginning. The next phase, "The Surge," will focus on scaling solutions like Danksharding, aiming for 100,000+ transactions per second. The future is scalable and secure.</p>
-                                </div>
-                            </div>
-                            <button class="text-blue-400 text-sm mt-3" onclick="toggleTranslation(this)">展开AI翻译 ▼</button>
-                            <div class="translation-content" style="color: var(--text-primary);">
-                                <p class="font-semibold mt-2">【AI翻译】</p>
-                                <p class="text-sm mt-1">向权益证明（PoS）的过渡仅仅是个开始。下一阶段“The Surge”将专注于Danksharding等扩容解决方案，目标是实现每秒超过10万笔交易。未来是可扩展且安全的。</p>
-                            </div>
+                <!-- 3. Total Supply -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH 总供应量 (12个月)</h2>
+                    <div class="chart-container">
+                        <canvas id="totalSupplyChart"></canvas>
+                    </div>
+                </div>
+                <!-- 4. ETH/BTC Ratios -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH/BTC 比率 (24个月)</h2>
+                    <div class="chart-container">
+                        <canvas id="ethBtcRatioChart"></canvas>
+                    </div>
+                </div>
+                <!-- ETF Section -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETF 资金流向</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                        <div>
+                            <p class="text-sm" style="color: var(--text-secondary);">每日净流入/流出</p>
+                            <p class="text-3xl font-bold text-green-400">+$150.3M</p>
                         </div>
-
-                        <div class="feed-card" data-source="techflow" data-type="analysis" data-importance="medium">
-                            <div class="flex items-center justify-between text-sm mb-2" style="color: var(--text-secondary);">
-                                <div class="flex items-center"><span class="mr-2">📰</span><span>深潮TechFlow · 1小时前</span></div>
-                                <div class="flex items-center">
-                                    <span class="tag tag-yellow">中重要性</span>
-                                    <span class="tag tag-green">深度分析</span>
-                                </div>
-                            </div>
-                            <h3 class="text-lg font-semibold" style="color: var(--text-primary);">解析EIP-7702：V神新提案如何改变以太坊账户抽象格局</h3>
-                            <p class="text-sm mt-2" style="color: var(--text-secondary);">Vitalik Buterin最新提出的EIP-7702旨在引入一种新的交易类型...</p>
-                        </div>
-
-                        <div class="feed-card" data-source="bankless" data-type="analysis" data-importance="high">
-                            <div class="flex items-center justify-between text-sm mb-2" style="color: var(--text-secondary);">
-                                <div class="flex items-center"><span class="mr-2">🎙️</span><span>Bankless 播客 · 3小时前</span></div>
-                                <div class="flex items-center">
-                                    <span class="tag tag-red">高重要性</span>
-                                    <span class="tag tag-green">深度分析</span>
-                                </div>
-                            </div>
-                            <h3 class="text-lg font-semibold" style="color: var(--text-primary);">【AI摘要】与Arthur Hayes探讨宏观经济与ETH的未来</h3>
-                            <ul class="list-disc list-inside text-sm space-y-1 mt-2" style="color: var(--text-primary);">
-                                <li>宏观经济：全球流动性周期是影响加密资产价格的最关键因素。</li>
-                                <li>ETH定位：以太坊作为“去中心化互联网的债券”...</li>
-                                <li>未来预测：随着ETF的普及和机构资金的流入...</li>
-                            </ul>
+                        <div>
+                            <p class="text-sm" style="color: var(--text-secondary);">总资产管理规模 (AUM)</p>
+                            <p class="text-3xl font-bold">$15.2B</p>
                         </div>
                     </div>
-                </section>
-
-                <!-- Section: Influencers -->
-                <section id="influencers-section" class="pt-6" style="border-color: var(--border-color);">
-                    <div class="flex justify-between items-center section-title">
-                        <h2 class="text-lg font-semibold" style="color: var(--text-title);">核心人物动态</h2>
-                        <button id="person-filter-btn" class="text-blue-400 text-sm">筛选 ▼</button>
-                    </div>
-                    <div id="person-filter-panel" class="hidden p-4 rounded-lg mb-4" style="background-color: var(--bg-card);">
-                        <p class="font-semibold mb-2">选择要显示的人物：</p>
-                        <div class="space-y-2">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" data-person="vitalik" class="person-toggle hidden" checked>
-                                <span class="w-10 h-5 rounded-full flex items-center p-1 transition-colors toggle-switch" style="background-color: var(--border-color);">
-                                    <span class="w-4 h-4 bg-white rounded-full transform transition-transform toggle-dot"></span>
-                                </span>
-                                <span class="ml-3">Vitalik Buterin</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" data-person="tomlee" class="person-toggle hidden" checked>
-                                <span class="w-10 h-5 rounded-full flex items-center p-1 transition-colors toggle-switch" style="background-color: var(--border-color);">
-                                    <span class="w-4 h-4 bg-white rounded-full transform transition-transform toggle-dot"></span>
-                                </span>
-                                <span class="ml-3">Tom Lee</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" data-person="arthur" class="person-toggle hidden">
-                                 <span class="w-10 h-5 rounded-full flex items-center p-1 transition-colors toggle-switch" style="background-color: var(--border-color);">
-                                    <span class="w-4 h-4 bg-white rounded-full transform transition-transform toggle-dot"></span>
-                                </span>
-                                <span class="ml-3">Arthur Hayes</span>
-                            </label>
+                </div>
+                 <!-- 6. Staking Data -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">质押数据 (Staking)</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4 text-center">
+                        <div>
+                            <p class="text-sm" style="color: var(--text-secondary);">总质押量</p>
+                            <p class="text-2xl font-bold">31.8M ETH</p>
+                        </div>
+                        <div>
+                            <p class="text-sm" style="color: var(--text-secondary);">质押比例</p>
+                            <p class="text-2xl font-bold">26.5%</p>
+                        </div>
+                        <div>
+                            <p class="text-sm" style="color: var(--text-secondary);">年化收益率 (APR)</p>
+                            <p class="text-2xl font-bold text-green-400">3.45%</p>
                         </div>
                     </div>
-                    <div id="influencers-feed">
-                        <div class="feed-card person-vitalik">
-                            <div class="flex items-center text-sm mb-3" style="color: var(--text-secondary);"><span class="mr-2">🐦</span><span>Twitter/X · 25分钟前</span></div>
-                            <div class="flex items-start">
-                                <img src="https://i.pravatar.cc/40?u=vitalik" class="w-10 h-10 rounded-full mr-3" alt="Vitalik Buterin">
-                                <div>
-                                    <p class="font-semibold" style="color: var(--text-primary);">Vitalik Buterin <span class="font-normal" style="color: var(--text-secondary);">@VitalikButerin</span></p>
-                                    <p class="mt-1" style="color: var(--text-primary);">The transition to Proof-of-Stake was just the beginning...</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="feed-card person-tomlee">
-                            <div class="flex items-center text-sm mb-3" style="color: var(--text-secondary);"><span class="mr-2">📺</span><span>CNBC 访谈 · 8小时前</span></div>
-                            <div class="flex items-start">
-                                <img src="https://i.pravatar.cc/40?u=tomlee" class="w-10 h-10 rounded-full mr-3" alt="Tom Lee">
-                                <div>
-                                    <p class="font-semibold" style="color: var(--text-primary);">Tom Lee <span class="font-normal" style="color: var(--text-secondary);">@fundstrat</span></p>
-                                    <p class="mt-1" style="color: var(--text-primary);">【AI摘要】我们仍然看好以太坊...</p>
-                                </div>
-                            </div>
-                        </div>
-                         <div class="feed-card person-arthur hidden">
-                            <div class="flex items-center text-sm mb-3" style="color: var(--text-secondary);"><span class="mr-2">🎙️</span><span>Bankless 播客 · 3小时前</span></div>
-                            <div class="flex items-start">
-                                <img src="https://i.pravatar.cc/40?u=arthur" class="w-10 h-10 rounded-full mr-3" alt="Arthur Hayes">
-                                <div>
-                                    <p class="font-semibold" style="color: var(--text-primary);">Arthur Hayes</p>
-                                    <p class="mt-1" style="color: var(--text-primary);">【AI摘要】全球流动性周期是影响加密资产价格的最关键因素...</p>
-                                </div>
-                            </div>
-                        </div>
+                    <h3 class="text-lg font-semibold mt-6 mb-2" style="color: var(--text-title);">每日净质押流量</h3>
+                    <div class="chart-container" style="height: 150px;">
+                        <canvas id="netStakingFlowChart"></canvas>
                     </div>
-                </section>
+                </div>
+                 <!-- 8. Stablecoin Data -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">稳定币市场份额</h2>
+                     <div class="chart-container">
+                        <canvas id="stablecoinChart"></canvas>
+                    </div>
+                    <h2 class="text-xl font-bold mt-6 mb-4" style="color: var(--text-title);">稳定币总市值 (12个月)</h2>
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="stablecoinMarketCapChart"></canvas>
+                    </div>
+                </div>
             </div>
 
-            <!-- Sidebar column (order-1 on mobile, order-2 on desktop) -->
-            <div class="lg:col-span-1 space-y-8 order-1 lg:order-2">
-                <!-- Section: Data Dashboard -->
-                <section id="data-dashboard">
-                    <h2 class="section-title">关键数据看板</h2>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="data-card">
-                            <p class="text-sm" style="color: var(--text-secondary);">ETH/USD 价格</p>
-                            <p class="text-2xl font-bold text-green-400">$4,642.23</p>
-                            <p class="text-sm text-green-400">+10.04%</p>
+            <!-- Sidebar Column -->
+            <div class="lg:col-span-1 space-y-6">
+                 <!-- 2. Market Cap -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH 市值占比</h2>
+                    <div class="chart-container">
+                        <canvas id="marketCapChart"></canvas>
+                    </div>
+                </div>
+                <!-- 5. Gas Fee -->
+                <div class="dashboard-card text-center">
+                    <h2 class="text-xl font-bold" style="color: var(--text-title);">主网 Gas 费用</h2>
+                    <p class="text-5xl font-extrabold my-4">12 <span class="text-3xl font-semibold" style="color: var(--text-secondary);">Gwei</span></p>
+                    <p class="text-sm" style="color: var(--text-secondary);">（标准交易）</p>
+                </div>
+                <!-- 7. ETH Burn Rate -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH 销毁速率</h2>
+                    <div class="flex justify-around text-center">
+                        <div>
+                            <p class="text-sm" style="color: var(--text-secondary);">24小时销毁</p>
+                            <p class="text-2xl font-bold">2,850 ETH</p>
                         </div>
-                        <div class="data-card">
-                            <p class="text-sm" style="color: var(--text-secondary);">ETH/BTC 汇率</p>
-                            <p class="text-2xl font-bold" style="color: var(--text-primary);">0.040</p>
-                            <p class="text-sm text-red-400">-1.2%</p>
-                        </div>
-                        <div class="data-card">
-                            <p class="text-sm" style="color: var(--text-secondary);">24小时交易量</p>
-                            <p class="text-xl font-bold" style="color: var(--text-primary);">$53.66B</p>
-                            <p class="text-sm" style="color: var(--text-secondary);">占总额 26.73%</p>
-                        </div>
-                        <div class="data-card">
-                            <p class="text-sm" style="color: var(--text-secondary);">主网 Gas 费</p>
-                            <p class="text-2xl font-bold" style="color: var(--text-primary);">12</p>
-                            <p class="text-sm" style="color: var(--text-secondary);">Gwei</p>
+                        <div>
+                            <p class="text-sm" style="color: var(--text-secondary);">7天销毁</p>
+                            <p class="text-2xl font-bold">21,540 ETH</p>
                         </div>
                     </div>
-                </section>
+                </div>
+                <!-- L2 Snapshot -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">Layer 2 生态快照</h2>
+                    <div class="space-y-4">
+                        <div class="text-center">
+                            <p class="text-sm" style="color: var(--text-secondary);">总锁仓量 (TVL)</p>
+                            <p class="text-2xl font-bold">$25.5B</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-sm" style="color: var(--text-secondary);">24小时交易费</p>
+                            <p class="text-2xl font-bold">$1.2M</p>
+                        </div>
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="l2TvlChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Exchange Balances -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">交易所余额净流向</h2>
+                    <div class="space-y-4 text-center">
+                        <div>
+                            <p class="text-sm" style="color: var(--text-secondary);">交易所总余额</p>
+                            <p class="text-2xl font-bold">12.8M ETH</p>
+                        </div>
+                        <div>
+                            <p class="text-sm" style="color: var(--text-secondary);">7日净流量</p>
+                            <p class="text-2xl font-bold text-red-400">-50,430 ETH</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Section: Treasuries -->
-                <section id="treasuries-section" class="pt-6" style="border-color: var(--border-color);">
-                    <h2 class="section-title">ETH Treasury 公司追踪</h2>
-                    <div class="feed-card overflow-x-auto horizontal-scroll">
+            <!-- Full-width Table -->
+            <div class="lg:col-span-3">
+                 <!-- 9. Treasury Companies -->
+                <div class="dashboard-card">
+                     <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH Treasury 公司追踪</h2>
+                     <div class="overflow-x-auto horizontal-scroll">
                         <table class="w-full text-left text-sm whitespace-nowrap">
                             <thead style="color: var(--text-secondary); border-color: var(--border-color);" class="border-b">
                                 <tr>
@@ -364,6 +223,7 @@
                                     <th class="py-2 px-3">股价</th>
                                     <th class="py-2 px-3">市值</th>
                                     <th class="py-2 px-3">mNAV</th>
+                                    <th class="py-2 px-3">占总供应量</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y" style="border-color: var(--border-color);">
@@ -374,6 +234,7 @@
                                     <td class="py-3 px-3">$12.50</td>
                                     <td class="py-3 px-3">$1.2B</td>
                                     <td class="py-3 px-3 text-green-400">413%</td>
+                                    <td class="py-3 px-3">0.89%</td>
                                 </tr>
                                 <tr>
                                     <td class="py-3 px-3 font-medium">SharpLink Gaming (SBET)</td>
@@ -382,6 +243,7 @@
                                     <td class="py-3 px-3">$0.88</td>
                                     <td class="py-3 px-3">$15M</td>
                                     <td class="py-3 px-3 text-green-400">4446%</td>
+                                    <td class="py-3 px-3">0.12%</td>
                                 </tr>
                                 <tr>
                                     <td class="py-3 px-3 font-medium">Metaplanet (JPX: 3350)</td>
@@ -390,152 +252,403 @@
                                     <td class="py-3 px-3">¥92</td>
                                     <td class="py-3 px-3">$60M</td>
                                     <td class="py-3 px-3 text-green-400">120%</td>
-                                </tr>
-                                 <tr>
-                                    <td class="py-3 px-3 font-medium">Coinbase (COIN)</td>
-                                    <td class="py-3 px-3">12,000</td>
-                                    <td class="py-3 px-3">$55M</td>
-                                    <td class="py-3 px-3">$245.7</td>
-                                    <td class="py-3 px-3">$58.4B</td>
-                                    <td class="py-3 px-3" style="color: var(--text-secondary);">0.09%</td>
+                                    <td class="py-3 px-3">0.013%</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                     <div class="feed-card">
-                        <div class="flex items-center text-sm mb-2" style="color: var(--text-secondary);">
-                            <span class="mr-2">📰</span>
-                            <span>Decrypt · 1天前</span>
-                        </div>
-                        <h3 class="text-lg font-semibold" style="color: var(--text-primary);">Public Keys: Ethereum Treasuries Soar, Bitcoin ETFs' $1 Billion Bleed</h3>
-                        <p class="text-sm mt-2" style="color: var(--text-secondary);">本周，持有ETH作为储备资产的公司数量显著增加...</p>
-                    </div>
-                </section>
+                </div>
             </div>
         </div>
     </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Theme switcher logic
+            // Chart.js Global Config and Theme Logic
             const themeToggleBtn = document.getElementById('theme-toggle-btn');
             const sunIcon = document.getElementById('theme-toggle-sun-icon');
             const moonIcon = document.getElementById('theme-toggle-moon-icon');
+            let charts = {};
+
+            const getChartOptions = (isLight) => ({
+                color: isLight ? '#6B7280' : '#9CA3AF',
+                borderColor: isLight ? '#E5E7EB' : '#374151'
+            });
+
+            function updateAllChartsTheme(isLight) {
+                const options = getChartOptions(isLight);
+                for (const chartId in charts) {
+                    if (charts.hasOwnProperty(chartId)) {
+                        const chart = charts[chartId];
+                        if (chart.options.plugins && chart.options.plugins.legend) {
+                           chart.options.plugins.legend.labels.color = options.color;
+                        }
+                        if (chart.options.plugins && chart.options.plugins.datalabels) {
+                            chart.options.plugins.datalabels.color = chartId === 'marketCap' || chartId === 'l2Tvl' || chartId === 'stablecoin' ? 
+                                (isLight ? '#ffffff' : '#111827') : options.color;
+                        }
+                        if (chart.options.scales && chart.options.scales.x) {
+                           chart.options.scales.x.ticks.color = options.color;
+                           chart.options.scales.x.grid.color = options.borderColor;
+                        }
+                        if(chart.options.scales && chart.options.scales.y) {
+                           chart.options.scales.y.ticks.color = options.color;
+                           chart.options.scales.y.grid.color = options.borderColor;
+                        }
+                        if(chart.options.scales && chart.options.scales.y2) {
+                           chart.options.scales.y2.ticks.color = options.color;
+                           chart.options.scales.y2.grid.display = false;
+                        }
+                        chart.update();
+                    }
+                }
+            }
 
             const applyTheme = (theme) => {
-                if (theme === 'light') {
-                    document.documentElement.classList.add('light');
-                    sunIcon.classList.remove('hidden');
-                    moonIcon.classList.add('hidden');
-                } else {
-                    document.documentElement.classList.remove('light');
-                    sunIcon.classList.add('hidden');
-                    moonIcon.classList.remove('hidden');
+                const isLight = theme === 'light';
+                document.documentElement.classList.toggle('light', isLight);
+                sunIcon.classList.toggle('hidden', !isLight);
+                moonIcon.classList.toggle('hidden', isLight);
+                // Ensure charts are initialized before updating their theme
+                if (Object.keys(charts).length > 0) {
+                    updateAllChartsTheme(isLight);
                 }
             };
-
-            // On page load or when changing themes, best to add inline in `head` to avoid FOUC
-            // But for this example, we'll do it here.
-            const preferredTheme = localStorage.getItem('theme') || 
-                                   (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
             
-            // Default to dark theme if no preference is stored
-            const initialTheme = localStorage.getItem('theme') ? preferredTheme : 'dark';
-            applyTheme(initialTheme);
-
-
             themeToggleBtn.addEventListener('click', () => {
-                const isLight = document.documentElement.classList.toggle('light');
-                const newTheme = isLight ? 'light' : 'dark';
+                const newTheme = document.documentElement.classList.contains('light') ? 'dark' : 'light';
                 localStorage.setItem('theme', newTheme);
                 applyTheme(newTheme);
             });
-
-
-            function toggleTranslation(button) {
-                const content = button.nextElementSibling;
-                if (content.style.maxHeight) {
-                    content.style.maxHeight = null;
-                    button.textContent = button.textContent.replace('收起', '展开').replace('▲', '▼');
-                } else {
-                    content.style.maxHeight = content.scrollHeight + "px";
-                    button.textContent = button.textContent.replace('展开', '收起').replace('▼', '▲');
+            
+            // Mock Data Generation
+            const generateCandlestickData = (count = 30) => {
+                let date = new Date();
+                date.setDate(date.getDate() - count);
+                const data = [];
+                let price = 3000;
+                for (let i = 0; i < count; i++) {
+                    date.setDate(date.getDate() + 1);
+                    const open = price + (Math.random() - 0.5) * 100;
+                    const close = open + (Math.random() - 0.5) * 150;
+                    const high = Math.max(open, close) + Math.random() * 50;
+                    const low = Math.min(open, close) - Math.random() * 50;
+                    price = close;
+                    data.push({ x: date.getTime(), o: open, h: high, l: low, c: close, v: Math.random() * 10000000 });
                 }
-            }
-            // Make toggleTranslation globally accessible
-            window.toggleTranslation = toggleTranslation;
-
-            // Influencer filter logic
-            const personFilterBtn = document.getElementById('person-filter-btn');
-            const personFilterPanel = document.getElementById('person-filter-panel');
-            const personToggles = document.querySelectorAll('.person-toggle');
-
-            personFilterBtn.addEventListener('click', () => {
-                personFilterPanel.classList.toggle('hidden');
-            });
-
-            const updateInfluencerFeed = () => {
-                personToggles.forEach(toggle => {
-                    const person = toggle.dataset.person;
-                    const cards = document.querySelectorAll(`.person-${person}`);
-                    cards.forEach(card => {
-                        card.classList.toggle('hidden', !toggle.checked);
-                    });
-                });
+                return data;
             };
 
-            personToggles.forEach(toggle => {
-                toggle.addEventListener('change', updateInfluencerFeed);
-            });
-            updateInfluencerFeed();
+            const generateLineData = (count, startValue, volatility) => {
+                const data = [];
+                let value = startValue;
+                for (let i = 0; i < count; i++) {
+                    data.push(value);
+                    value += (Math.random() - 0.5) * volatility;
+                }
+                return data;
+            };
+            
+            const generateBarData = (count, max) => {
+                const data = [];
+                for (let i=0; i<count; ++i) {
+                    data.push(Math.random() * max - max/2);
+                }
+                return data;
+            }
 
-            // Unified Feed filter logic
-            const feedFilterBtn = document.getElementById('feed-filter-btn');
-            const feedFilterPanel = document.getElementById('feed-filter-panel');
-            const applyFiltersBtn = document.getElementById('apply-filters-btn');
-            const resetFiltersBtn = document.getElementById('reset-filters-btn');
-            const feedCards = document.querySelectorAll('#unified-feed .feed-card');
-            const filterCheckboxes = document.querySelectorAll('#feed-filter-panel input[type="checkbox"]');
-
-            feedFilterBtn.addEventListener('click', () => {
-                feedFilterPanel.classList.toggle('hidden');
-            });
-
-            const applyFeedFilters = () => {
-                const activeFilters = {};
-                
-                filterCheckboxes.forEach(checkbox => {
-                    const group = checkbox.dataset.filterGroup;
-                    if (!activeFilters[group]) {
-                        activeFilters[group] = [];
-                    }
-                    if (checkbox.checked) {
-                        activeFilters[group].push(checkbox.value);
-                    }
-                });
-
-                feedCards.forEach(card => {
-                    let isVisible = true;
-                    for (const group in activeFilters) {
-                        const selectedValues = activeFilters[group];
-                        if (selectedValues.length > 0) {
-                            const cardValue = card.dataset[group];
-                            if (!selectedValues.includes(cardValue)) {
-                                isVisible = false;
-                                break;
+            const generateTimeLabels = (count) => {
+                const labels = [];
+                const date = new Date();
+                date.setDate(1); // Set the day to the 1st
+                date.setMonth(date.getMonth() - count + 1);
+                for (let i = 0; i < count; i++) {
+                    labels.push(date.toLocaleString('default', { month: 'short', year: '2-digit' }));
+                    date.setMonth(date.getMonth() + 1);
+                }
+                return labels;
+            };
+            
+            // Chart Initialization
+            // 1. Price & Volume Chart
+            const priceVolumeCtx = document.getElementById('priceVolumeChart');
+            if (priceVolumeCtx) {
+                const candleData = generateCandlestickData();
+                charts.priceVolume = new Chart(priceVolumeCtx, {
+                    type: 'candlestick',
+                    data: {
+                        datasets: [{
+                            label: 'ETH Price',
+                            data: candleData.map(d => ({x: d.x, o: d.o, h: d.h, l: d.l, c: d.c})),
+                            yAxisID: 'y'
+                        }, {
+                            type: 'bar',
+                            label: 'Volume',
+                            data: candleData.map(d => ({x: d.x, y: d.v})),
+                            yAxisID: 'y2',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { type: 'time', time: { unit: 'day' }, grid: { display: false } },
+                            y: { position: 'left', title: { display: true, text: 'Price (USD)' } },
+                            y2: { 
+                                position: 'right', 
+                                title: { display: true, text: 'Volume' }, 
+                                grid: { drawOnChartArea: false }, 
+                                ticks: { 
+                                    display: true,
+                                    callback: function(value, index, values) {
+                                        if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+                                        if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
+                                        return value;
+                                    }
+                                } 
+                            }
+                        },
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        const raw = context.raw;
+                                        if (context.dataset.yAxisID === 'y') {
+                                            const o = raw.o.toFixed(2);
+                                            const h = raw.h.toFixed(2);
+                                            const l = raw.l.toFixed(2);
+                                            const c = raw.c.toFixed(2);
+                                            return `O: ${o} H: ${h} L: ${l} C: ${c}`;
+                                        }
+                                        return context.dataset.label + ': ' + new Intl.NumberFormat().format(raw.y);
+                                    }
+                                }
                             }
                         }
                     }
-                    card.style.display = isVisible ? '' : 'none';
                 });
-            };
+            }
             
-            applyFiltersBtn.addEventListener('click', applyFeedFilters);
+            // 2. Market Cap Chart
+            const marketCapCtx = document.getElementById('marketCapChart');
+            if(marketCapCtx) {
+                charts.marketCap = new Chart(marketCapCtx, {
+                    type: 'doughnut',
+                    plugins: [ChartDataLabels],
+                    data: {
+                        labels: ['Ethereum', 'Bitcoin', 'Others'],
+                        datasets: [{
+                            data: [18.5, 45.2, 36.3],
+                            backgroundColor: ['#6366F1', '#F59E0B', '#4B5563'],
+                            borderColor: 'var(--bg-card)',
+                            borderWidth: 4,
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { position: 'bottom' },
+                            datalabels: {
+                                formatter: (value) => value + '%',
+                                color: '#fff',
+                                font: { weight: 'bold' }
+                            }
+                        } 
+                    }
+                });
+            }
 
-            resetFiltersBtn.addEventListener('click', () => {
-                filterCheckboxes.forEach(checkbox => checkbox.checked = true);
-                applyFeedFilters();
-            });
+            // 3. Total Supply Chart
+            const totalSupplyCtx = document.getElementById('totalSupplyChart');
+            if(totalSupplyCtx) {
+                charts.totalSupply = new Chart(totalSupplyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: generateTimeLabels(12),
+                        datasets: [{
+                            label: 'Total Supply',
+                            data: [120.2, 120.18, 120.15, 120.13, 120.11, 120.09, 120.08, 120.05, 120.04, 120.02, 120.01, 119.99],
+                            borderColor: '#3B82F6',
+                            tension: 0.1,
+                            fill: false
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        }, 
+                        scales: { y: { title: { display: true, text: 'ETH (Millions)' } } } 
+                    }
+                });
+            }
+
+            // 4. ETH/BTC Ratio Chart
+            const ethBtcRatioCtx = document.getElementById('ethBtcRatioChart');
+            if(ethBtcRatioCtx) {
+                charts.ethBtcRatio = new Chart(ethBtcRatioCtx, {
+                    type: 'line',
+                    data: {
+                        labels: generateTimeLabels(24),
+                        datasets: [{
+                            label: 'Price Ratio',
+                            data: generateLineData(24, 0.055, 0.005),
+                            borderColor: '#8B5CF6',
+                            yAxisID: 'y',
+                        }, {
+                            label: 'Market Cap Ratio',
+                            data: generateLineData(24, 0.38, 0.02),
+                            borderColor: '#EC4899',
+                            yAxisID: 'y2',
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        }, 
+                        scales: { y: { position: 'left' }, y2: { position: 'right', grid: { drawOnChartArea: false } } } 
+                    }
+                });
+            }
+
+            // 6. Staking Data Charts
+            const netStakingFlowCtx = document.getElementById('netStakingFlowChart');
+            if (netStakingFlowCtx) {
+                const data = generateBarData(30, 20000);
+                charts.netStakingFlow = new Chart(netStakingFlowCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Array.from({length: 30}, (_, i) => i + 1),
+                        datasets: [{
+                            label: 'Net Staking Flow',
+                            data: data,
+                            backgroundColor: data.map(v => v >= 0 ? 'rgba(75, 192, 192, 0.5)' : 'rgba(255, 99, 132, 0.5)'),
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { 
+                            x: { ticks: { display: false }, grid: { display: false } },
+                            y: { title: { display: true, text: 'ETH' } }
+                        }
+                    }
+                });
+            }
+
+            // L2 TVL Chart
+            const l2TvlCtx = document.getElementById('l2TvlChart');
+            if (l2TvlCtx) {
+                charts.l2Tvl = new Chart(l2TvlCtx, {
+                    type: 'doughnut',
+                    plugins: [ChartDataLabels],
+                    data: {
+                        labels: ['Arbitrum', 'Optimism', 'Base', 'Others'],
+                        datasets: [{
+                            data: [45, 25, 15, 15],
+                            backgroundColor: ['#2D8EFF', '#FF0420', '#0052FF', '#4B5563'],
+                            borderColor: 'var(--bg-card)',
+                            borderWidth: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { position: 'bottom', labels: { boxWidth: 12 } },
+                            datalabels: {
+                                formatter: (value) => value + '%',
+                                color: '#fff',
+                                font: { weight: 'bold' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 8. Stablecoin Chart
+            const stablecoinCtx = document.getElementById('stablecoinChart');
+            if(stablecoinCtx) {
+                 charts.stablecoin = new Chart(stablecoinCtx, {
+                    type: 'doughnut',
+                    plugins: [ChartDataLabels],
+                    data: {
+                        labels: ['Ethereum Based', 'Other Networks'],
+                        datasets: [{
+                            data: [52, 48],
+                            backgroundColor: ['#6366F1', '#4B5563'],
+                            borderColor: 'var(--bg-card)',
+                            borderWidth: 4,
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { position: 'bottom' },
+                            datalabels: {
+                                formatter: (value) => value + '%',
+                                color: '#fff',
+                                font: { weight: 'bold' }
+                            }
+                        } 
+                    }
+                });
+            }
+            
+            const stablecoinMarketCapCtx = document.getElementById('stablecoinMarketCapChart');
+            if(stablecoinMarketCapCtx) {
+                charts.stablecoinMarketCap = new Chart(stablecoinMarketCapCtx, {
+                    type: 'line',
+                    data: {
+                        labels: generateTimeLabels(12),
+                        datasets: [{
+                            label: 'Total Market Cap',
+                            data: generateLineData(12, 150, 10), // Start at 150B, volatility 10
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: { display: true, text: 'Market Cap (Billions USD)' }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Set initial theme
+            const initialTheme = localStorage.getItem('theme') || 'dark';
+            applyTheme(initialTheme);
         });
     </script>
 
