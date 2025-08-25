@@ -83,9 +83,9 @@
                     </div>
                 </div>
 
-                <!-- 3. Total Supply -->
+                <!-- 3. Total Supply & Market Cap -->
                 <div class="dashboard-card">
-                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH 总供应量 (12个月)</h2>
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH 总供应量 & 市值 (12个月)</h2>
                     <div class="chart-container">
                         <canvas id="totalSupplyChart"></canvas>
                     </div>
@@ -95,20 +95,6 @@
                     <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH/BTC 比率 (24个月)</h2>
                     <div class="chart-container">
                         <canvas id="ethBtcRatioChart"></canvas>
-                    </div>
-                </div>
-                <!-- ETF Section -->
-                <div class="dashboard-card">
-                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETF 资金流向</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
-                        <div>
-                            <p class="text-sm" style="color: var(--text-secondary);">每日净流入/流出</p>
-                            <p class="text-3xl font-bold text-green-400">+$150.3M</p>
-                        </div>
-                        <div>
-                            <p class="text-sm" style="color: var(--text-secondary);">总资产管理规模 (AUM)</p>
-                            <p class="text-3xl font-bold">$15.2B</p>
-                        </div>
                     </div>
                 </div>
                  <!-- 6. Staking Data -->
@@ -133,6 +119,17 @@
                         <canvas id="netStakingFlowChart"></canvas>
                     </div>
                 </div>
+                <!-- 2. Market Cap -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH 市值占比</h2>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="marketCapChart"></canvas>
+                    </div>
+                    <h2 class="text-xl font-bold mt-6 mb-4" style="color: var(--text-title);">加密货币总市值 (12个月)</h2>
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="totalCryptoMarketCapChart"></canvas>
+                    </div>
+                </div>
                  <!-- 8. Stablecoin Data -->
                 <div class="dashboard-card">
                     <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">稳定币市场份额</h2>
@@ -144,17 +141,72 @@
                         <canvas id="stablecoinMarketCapChart"></canvas>
                     </div>
                 </div>
+                 <!-- ETF Section -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETF 资金流向</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                        <div>
+                            <p class="text-sm" style="color: var(--text-secondary);">每日净流入/流出</p>
+                            <p class="text-3xl font-bold text-green-400">+$150.3M</p>
+                        </div>
+                        <div>
+                            <p class="text-sm" style="color: var(--text-secondary);">总资产管理规模 (AUM)</p>
+                            <p class="text-3xl font-bold">$15.2B</p>
+                        </div>
+                    </div>
+                </div>
+                 <!-- 9. Treasury Companies -->
+                <div class="dashboard-card">
+                     <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH Treasury 公司追踪</h2>
+                     <div class="overflow-x-auto horizontal-scroll">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead style="color: var(--text-secondary); border-color: var(--border-color);" class="border-b">
+                                <tr>
+                                    <th class="py-2 px-3">公司</th>
+                                    <th class="py-2 px-3">持仓量 (ETH)</th>
+                                    <th class="py-2 px-3">价值 (USD)</th>
+                                    <th class="py-2 px-3">股价</th>
+                                    <th class="py-2 px-3">市值</th>
+                                    <th class="py-2 px-3">mNAV</th>
+                                    <th class="py-2 px-3">占总供应量</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y" style="border-color: var(--border-color);">
+                                <tr>
+                                    <td class="py-3 px-3 font-medium">Bitmine Immersion (MNEE)</td>
+                                    <td class="py-3 px-3">1,070,000</td>
+                                    <td class="py-3 px-3">$4.96B</td>
+                                    <td class="py-3 px-3">$12.50</td>
+                                    <td class="py-3 px-3">$1.2B</td>
+                                    <td class="py-3 px-3 text-green-400">413%</td>
+                                    <td class="py-3 px-3">0.89%</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-3 font-medium">SharpLink Gaming (SBET)</td>
+                                    <td class="py-3 px-3">143,593</td>
+                                    <td class="py-3 px-3">$667M</td>
+                                    <td class="py-3 px-3">$0.88</td>
+                                    <td class="py-3 px-3">$15M</td>
+                                    <td class="py-3 px-3 text-green-400">4446%</td>
+                                    <td class="py-3 px-3">0.12%</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-3 font-medium">Metaplanet (JPX: 3350)</td>
+                                    <td class="py-3 px-3">15,555</td>
+                                    <td class="py-3 px-3">$72M</td>
+                                    <td class="py-3 px-3">¥92</td>
+                                    <td class="py-3 px-3">$60M</td>
+                                    <td class="py-3 px-3 text-green-400">120%</td>
+                                    <td class="py-3 px-3">0.013%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- Sidebar Column -->
             <div class="lg:col-span-1 space-y-6">
-                 <!-- 2. Market Cap -->
-                <div class="dashboard-card">
-                    <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH 市值占比</h2>
-                    <div class="chart-container">
-                        <canvas id="marketCapChart"></canvas>
-                    </div>
-                </div>
                 <!-- 5. Gas Fee -->
                 <div class="dashboard-card text-center">
                     <h2 class="text-xl font-bold" style="color: var(--text-title);">主网 Gas 费用</h2>
@@ -204,58 +256,6 @@
                             <p class="text-sm" style="color: var(--text-secondary);">7日净流量</p>
                             <p class="text-2xl font-bold text-red-400">-50,430 ETH</p>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Full-width Table -->
-            <div class="lg:col-span-3">
-                 <!-- 9. Treasury Companies -->
-                <div class="dashboard-card">
-                     <h2 class="text-xl font-bold mb-4" style="color: var(--text-title);">ETH Treasury 公司追踪</h2>
-                     <div class="overflow-x-auto horizontal-scroll">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead style="color: var(--text-secondary); border-color: var(--border-color);" class="border-b">
-                                <tr>
-                                    <th class="py-2 px-3">公司</th>
-                                    <th class="py-2 px-3">持仓量 (ETH)</th>
-                                    <th class="py-2 px-3">价值 (USD)</th>
-                                    <th class="py-2 px-3">股价</th>
-                                    <th class="py-2 px-3">市值</th>
-                                    <th class="py-2 px-3">mNAV</th>
-                                    <th class="py-2 px-3">占总供应量</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y" style="border-color: var(--border-color);">
-                                <tr>
-                                    <td class="py-3 px-3 font-medium">Bitmine Immersion (MNEE)</td>
-                                    <td class="py-3 px-3">1,070,000</td>
-                                    <td class="py-3 px-3">$4.96B</td>
-                                    <td class="py-3 px-3">$12.50</td>
-                                    <td class="py-3 px-3">$1.2B</td>
-                                    <td class="py-3 px-3 text-green-400">413%</td>
-                                    <td class="py-3 px-3">0.89%</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-3 px-3 font-medium">SharpLink Gaming (SBET)</td>
-                                    <td class="py-3 px-3">143,593</td>
-                                    <td class="py-3 px-3">$667M</td>
-                                    <td class="py-3 px-3">$0.88</td>
-                                    <td class="py-3 px-3">$15M</td>
-                                    <td class="py-3 px-3 text-green-400">4446%</td>
-                                    <td class="py-3 px-3">0.12%</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-3 px-3 font-medium">Metaplanet (JPX: 3350)</td>
-                                    <td class="py-3 px-3">15,555</td>
-                                    <td class="py-3 px-3">$72M</td>
-                                    <td class="py-3 px-3">¥92</td>
-                                    <td class="py-3 px-3">$60M</td>
-                                    <td class="py-3 px-3 text-green-400">120%</td>
-                                    <td class="py-3 px-3">0.013%</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
@@ -463,8 +463,43 @@
                     }
                 });
             }
+            
+             // Total Crypto Market Cap Chart
+            const totalCryptoMarketCapCtx = document.getElementById('totalCryptoMarketCapChart');
+            if(totalCryptoMarketCapCtx) {
+                charts.totalCryptoMarketCap = new Chart(totalCryptoMarketCapCtx, {
+                    type: 'line',
+                    data: {
+                        labels: generateTimeLabels(12),
+                        datasets: [{
+                            label: 'Total Crypto Market Cap',
+                            data: generateLineData(12, 2.5, 0.5), // Start at 2.5T
+                            borderColor: '#F59E0B',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            fill: true,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: { display: true, text: 'Market Cap (Trillions USD)' }
+                            }
+                        }
+                    }
+                });
+            }
 
-            // 3. Total Supply Chart
+            // 3. Total Supply & Market Cap Chart
             const totalSupplyCtx = document.getElementById('totalSupplyChart');
             if(totalSupplyCtx) {
                 charts.totalSupply = new Chart(totalSupplyCtx, {
@@ -476,20 +511,38 @@
                             data: [120.2, 120.18, 120.15, 120.13, 120.11, 120.09, 120.08, 120.05, 120.04, 120.02, 120.01, 119.99],
                             borderColor: '#3B82F6',
                             tension: 0.1,
-                            fill: false
+                            fill: false,
+                            yAxisID: 'y',
+                        }, {
+                            label: 'Total Market Cap',
+                            data: generateLineData(12, 350, 50),
+                            borderColor: '#10B981',
+                            tension: 0.1,
+                            fill: false,
+                            yAxisID: 'y2',
                         }]
                     },
                     options: { 
                         responsive: true, 
                         maintainAspectRatio: false, 
                         plugins: { 
-                            legend: { display: false },
+                            legend: { position: 'bottom' },
                             tooltip: {
                                 mode: 'index',
                                 intersect: false
                             }
                         }, 
-                        scales: { y: { title: { display: true, text: 'ETH (Millions)' } } } 
+                        scales: { 
+                            y: { 
+                                position: 'left',
+                                title: { display: true, text: 'ETH (Millions)' } 
+                            },
+                            y2: {
+                                position: 'right',
+                                title: { display: true, text: 'Market Cap (Billions USD)' },
+                                grid: { drawOnChartArea: false }
+                            }
+                        } 
                     }
                 });
             }

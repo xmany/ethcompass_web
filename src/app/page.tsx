@@ -1,8 +1,24 @@
 import Header from '@/components/Header';
-import DataDashboard from '@/components/dashboard/DataDashboard';
-import UnifiedFeed from '@/components/feed/UnifiedFeed';
 import TreasuryTable from '@/components/treasury/TreasuryTable';
-import InfluencerFeed from '@/components/influencer/InfluencerFeed';
+
+// Chart components
+import {
+  PriceVolumeChart,
+  TotalSupplyChart,
+  EthBtcRatioChart,
+  StakingData,
+  MarketCapCharts,
+  StablecoinCharts
+} from '@/components/charts';
+
+// Stats components
+import {
+  ETFDisplay,
+  GasFeeDisplay,
+  BurnRateDisplay,
+  L2Snapshot,
+  ExchangeBalances
+} from '@/components/stats';
 
 export default function Home() {
   return (
@@ -10,24 +26,48 @@ export default function Home() {
       <Header />
       
       <main className="max-w-7xl mx-auto p-4 lg:p-6">
-        <div className="flex flex-col lg:grid lg:grid-cols-3 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Main content column (order-2 on mobile, order-1 on desktop) */}
-          <div className="lg:col-span-2 order-2 lg:order-1">
-            {/* Unified Feed Section */}
-            <UnifiedFeed />
+          {/* Main Column */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* 1. Price & Volume */}
+            <PriceVolumeChart />
             
-            {/* Influencers Section */}
-            <InfluencerFeed />
+            {/* 3. Total Supply & Market Cap */}
+            <TotalSupplyChart />
+            
+            {/* 4. ETH/BTC Ratios */}
+            <EthBtcRatioChart />
+            
+            {/* 6. Staking Data */}
+            <StakingData />
+            
+            {/* 2. Market Cap */}
+            <MarketCapCharts />
+            
+            {/* 8. Stablecoin Data */}
+            <StablecoinCharts />
+            
+            {/* ETF Section */}
+            <ETFDisplay />
+            
+            {/* 9. Treasury Companies */}
+            <TreasuryTable />
           </div>
           
-          {/* Sidebar column (order-1 on mobile, order-2 on desktop) */}
-          <div className="lg:col-span-1 space-y-8 order-1 lg:order-2">
-            {/* Data Dashboard Section */}
-            <DataDashboard />
+          {/* Sidebar Column */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* 5. Gas Fee */}
+            <GasFeeDisplay />
             
-            {/* Treasury Tracking Section */}
-            <TreasuryTable />
+            {/* 7. ETH Burn Rate */}
+            <BurnRateDisplay />
+            
+            {/* L2 Snapshot */}
+            <L2Snapshot />
+            
+            {/* Exchange Balances */}
+            <ExchangeBalances />
           </div>
         </div>
       </main>
