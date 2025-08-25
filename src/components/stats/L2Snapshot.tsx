@@ -6,10 +6,11 @@ import { mockL2Data } from '@/utils/mockData';
 import DashboardCard from '@/components/common/DashboardCard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getChartOptions, commonChartOptions } from '@/utils/chartConfig';
+import { DoughnutChartData } from '@/types/charts';
 
 export default function L2Snapshot() {
   const { theme } = useTheme();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<DoughnutChartData | null>(null);
   const isLight = theme === 'light';
 
   useEffect(() => {

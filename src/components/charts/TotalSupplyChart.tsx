@@ -6,10 +6,11 @@ import { generateLineData, generateTimeLabels } from '@/utils/mockData';
 import DashboardCard from '@/components/common/DashboardCard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getChartOptions, commonChartOptions } from '@/utils/chartConfig';
+import { LineChartData } from '@/types/charts';
 
 export default function TotalSupplyChart() {
   const { theme } = useTheme();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<LineChartData | null>(null);
   const isLight = theme === 'light';
 
   useEffect(() => {

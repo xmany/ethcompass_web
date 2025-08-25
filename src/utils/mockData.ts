@@ -8,7 +8,7 @@ export interface CandlestickData {
 }
 
 export const generateCandlestickData = (count: number = 30): CandlestickData[] => {
-  let date = new Date();
+  const date = new Date();
   date.setDate(date.getDate() - count);
   const data: CandlestickData[] = [];
   let price = 3000;

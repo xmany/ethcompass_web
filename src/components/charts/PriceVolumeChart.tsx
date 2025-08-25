@@ -1,11 +1,21 @@
 'use client';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useRef } from 'react';
 import { Chart as ChartJS } from 'chart.js';
 import { generateCandlestickData } from '@/utils/mockData';
 import DashboardCard from '@/components/common/DashboardCard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getChartOptions } from '@/utils/chartConfig';
+
+interface CandlestickRaw {
+  o?: number;
+  h?: number;
+  l?: number;
+  c?: number;
+  y?: number;
+}
 
 export default function PriceVolumeChart() {
   const { theme } = useTheme();
@@ -53,7 +63,7 @@ export default function PriceVolumeChart() {
             }
           } as any,
           {
-            type: 'bar' as any,
+            type: 'bar',
             label: 'Volume',
             data: candleData.map(d => ({x: d.x, y: d.v})),
             yAxisID: 'y2',
@@ -109,9 +119,10 @@ export default function PriceVolumeChart() {
             },
             ticks: {
               color: chartColors.color,
-              callback: function(value: any) {
-                if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
-                if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
+              callback: function(value: string | number) {
+                const num = typeof value === 'number' ? value : parseFloat(value);
+                if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+                if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
                 return value;
               }
             }
@@ -124,7 +135,7 @@ export default function PriceVolumeChart() {
           tooltip: {
             callbacks: {
               label: function(context: any) {
-                const raw = context.raw;
+                const raw = context.raw as CandlestickRaw;
                 if (context.datasetIndex === 0) {
                   const o = raw.o?.toFixed(2) || '0';
                   const h = raw.h?.toFixed(2) || '0';
@@ -139,7 +150,7 @@ export default function PriceVolumeChart() {
           datalabels: {
             display: false
           }
-        } as any
+        } as Record<string, unknown>
       }
     });
 

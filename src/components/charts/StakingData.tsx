@@ -6,10 +6,12 @@ import { generateBarData, mockStakingData } from '@/utils/mockData';
 import DashboardCard from '@/components/common/DashboardCard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getChartOptions, commonChartOptions } from '@/utils/chartConfig';
+import { BarChartData } from '@/types/charts';
+import { TooltipItem } from 'chart.js';
 
 export default function StakingData() {
   const { theme } = useTheme();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<BarChartData | null>(null);
   const isLight = theme === 'light';
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export default function StakingData() {
         mode: 'index' as const,
         intersect: false,
         callbacks: {
-          label: function(context: any) {
+          label: function(context: TooltipItem<'bar'>) {
             const value = context.parsed.y;
             const label = value >= 0 ? '存入: ' : '提取: ';
             return label + Math.abs(value).toLocaleString() + ' ETH';

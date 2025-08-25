@@ -6,11 +6,12 @@ import { generateLineData, generateTimeLabels, mockMarketCapData } from '@/utils
 import DashboardCard from '@/components/common/DashboardCard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getChartOptions, commonChartOptions } from '@/utils/chartConfig';
+import { DoughnutChartData, LineChartData } from '@/types/charts';
 
 export default function MarketCapCharts() {
   const { theme } = useTheme();
-  const [doughnutData, setDoughnutData] = useState<any>(null);
-  const [lineData, setLineData] = useState<any>(null);
+  const [doughnutData, setDoughnutData] = useState<DoughnutChartData | null>(null);
+  const [lineData, setLineData] = useState<LineChartData | null>(null);
   const isLight = theme === 'light';
 
   useEffect(() => {
