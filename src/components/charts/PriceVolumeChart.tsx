@@ -5,6 +5,7 @@
 import { useEffect, useRef } from 'react';
 import { Chart as ChartJS } from 'chart.js';
 import { generateCandlestickData } from '@/utils/mockData';
+import { useEthMetrics } from '@/hooks/useEthMetrics';
 import DashboardCard from '@/components/common/DashboardCard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getChartOptions } from '@/utils/chartConfig';
@@ -22,16 +23,20 @@ export default function PriceVolumeChart() {
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstance = useRef<ChartJS | null>(null);
   const isLight = theme === 'light';
+  
+  // Fetch real ETH data from Firestore
+  const { data: ethData, loading, error } = useEthMetrics(30);
 
   useEffect(() => {
-    if (!chartRef.current) return;
+    if (!chartRef.current || loading || !ethData) return;
 
     // Destroy existing chart
     if (chartInstance.current) {
       chartInstance.current.destroy();
     }
 
-    const candleData = generateCandlestickData(30);
+    // Use real data if available, fallback to mock data if not
+    const candleData = ethData.length > 0 ? ethData : generateCandlestickData(30);
     const chartColors = getChartOptions(isLight);
     
     const ctx = chartRef.current.getContext('2d');
@@ -159,7 +164,7 @@ export default function PriceVolumeChart() {
         chartInstance.current.destroy();
       }
     };
-  }, [isLight]);
+  }, [isLight, ethData, loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <DashboardCard>
@@ -167,7 +172,22 @@ export default function PriceVolumeChart() {
         ETH 价格 & 交易量 (日线)
       </h2>
       <div className="relative" style={{ height: '400px' }}>
-        <canvas ref={chartRef}></canvas>
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-gray-500">加载中...</div>
+          </div>
+        )}
+        {error && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-red-500">加载失败: {error}</div>
+          </div>
+        )}
+        {!loading && !error && ethData && ethData.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-gray-500">暂无数据，使用模拟数据</div>
+          </div>
+        )}
+        <canvas ref={chartRef} style={{ display: loading ? 'none' : 'block' }}></canvas>
       </div>
     </DashboardCard>
   );

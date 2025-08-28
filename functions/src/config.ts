@@ -1,0 +1,1 @@
+export const kRegion = "asia-southeast1";

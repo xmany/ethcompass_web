@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans_SC } from "next/font/google";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { FirebaseProvider } from "@/providers/FirebaseProvider";
 import "./globals.css";
 
 const notoSansSC = Noto_Sans_SC({
@@ -36,9 +37,11 @@ export default function RootLayout({
         className={`${notoSansSC.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <FirebaseProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </FirebaseProvider>
       </body>
     </html>
   );

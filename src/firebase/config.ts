@@ -1,7 +1,7 @@
 // src/firebase/config.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -17,6 +17,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
-const db = getFirestore(app);
+const firestore = getFirestore(app, "ethfirestore");
 
-export { app, auth, db };
+// Initialize Firestore with the named database 'ethfirestore'
+// Note: For client SDK, we need to pass the database ID in the initialization
+// let firestore: Firestore;
+// try {
+//     // Try to get existing firestore instance
+//     firestore = getFirestore(app, "ethfirestore");
+// } catch (e) {
+//     // If it doesn't exist, initialize it
+//     firestore = initializeFirestore(app, {}, "ethfirestore");
+// }
+
+export { app, auth, firestore };
