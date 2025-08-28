@@ -164,7 +164,7 @@ export default function PriceVolumeChart() {
         chartInstance.current.destroy();
       }
     };
-  }, [isLight, ethData, loading]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLight, ethData, loading]);
 
   return (
     <DashboardCard>
