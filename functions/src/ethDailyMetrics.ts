@@ -5,27 +5,11 @@ import * as admin from "firebase-admin";
 import {getFirestore} from "firebase-admin/firestore";
 import axios from "axios";
 import { kDailyMetricsEthCollection } from "./config";
+import { EthDailyMetrics } from "./models";
 
 // Get Firestore with the named database 'ethfirestore' as configured in firebase.json
 // Using the proper API for firebase-admin v12+
 const db = getFirestore("ethfirestore");
-
-/**
- * Interface for ETH daily metrics document
- */
-interface EthDailyMetrics {
-  timestamp: admin.firestore.Timestamp;
-  timestampISO: string;
-  price: {
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-  };
-  volume: number;
-  createdAt?: admin.firestore.Timestamp;  // Optional for reading existing docs without this field
-  updatedAt?: admin.firestore.Timestamp;  // Optional for reading existing docs without this field
-}
 
 /**
  * Interface for CoinGecko OHLC candle data
@@ -297,32 +281,71 @@ export const fetchEthDailyData = onSchedule(
         throw new Error("No data available for yesterday");
       }
 
-      // Fetch volume data using market_chart API with 2 days (to get yesterday's data)
+      // Fetch volume and market cap data using market_chart API with 2 days (to get yesterday's data)
       // market_chart API accepts any number of days, not limited like OHLC
-      const volumeResponse = await axios.get(
+      const marketChartResponse = await axios.get(
         "https://api.coingecko.com/api/v3/coins/ethereum/market_chart",
         {
           params: {
             // x_cg_demo_api_key: process.env.COINGECKO_API_KEY,
             vs_currency: "usd",
-            days: 2, // Only fetch 2 days to get yesterday's volume
+            days: 2, // Only fetch 2 days to get yesterday's data
             interval: "daily",
             precision: 0, // No decimal places
           },
         }
       );
 
-      // Find volume for yesterday
+      // Find volume and market cap for yesterday
       let volume = 0;
-      if (volumeResponse.data && volumeResponse.data.total_volumes) {
-        for (const vol of volumeResponse.data.total_volumes) {
-          const volDate = new Date(vol[0]);
-          volDate.setUTCHours(0, 0, 0, 0);
-          if (volDate.getTime() === yesterday.getTime()) {
-            volume = vol[1];
-            break;
+      let marketCap = 0;
+      
+      if (marketChartResponse.data) {
+        // Extract volume
+        if (marketChartResponse.data.total_volumes) {
+          for (const vol of marketChartResponse.data.total_volumes) {
+            const volDate = new Date(vol[0]);
+            volDate.setUTCHours(0, 0, 0, 0);
+            if (volDate.getTime() === yesterday.getTime()) {
+              volume = vol[1];
+              break;
+            }
           }
         }
+        
+        // Extract market cap
+        if (marketChartResponse.data.market_caps) {
+          for (const cap of marketChartResponse.data.market_caps) {
+            const capDate = new Date(cap[0]);
+            capDate.setUTCHours(0, 0, 0, 0);
+            if (capDate.getTime() === yesterday.getTime()) {
+              marketCap = cap[1];
+              break;
+            }
+          }
+        }
+      }
+
+      // Fetch current coin data for total supply
+      const coinDataResponse = await axios.get(
+        "https://api.coingecko.com/api/v3/coins/ethereum",
+        {
+          params: {
+            // x_cg_demo_api_key: process.env.COINGECKO_API_KEY,
+            localization: false,
+            tickers: false,
+            market_data: true,
+            community_data: false,
+            developer_data: false,
+            sparkline: false,
+          },
+        }
+      );
+
+      // Extract total supply (this will be current supply, not historical)
+      let totalSupply = 0;
+      if (coinDataResponse.data && coinDataResponse.data.market_data) {
+        totalSupply = coinDataResponse.data.market_data.total_supply || 0;
       }
 
       // Create the document data
@@ -337,6 +360,8 @@ export const fetchEthDailyData = onSchedule(
           close: dailyOHLC.close,
         },
         volume: volume,
+        totalSupply: totalSupply,
+        marketCap: marketCap,
         createdAt: now,
         updatedAt: now,
       };
@@ -454,11 +479,11 @@ export const fetchEthDataManual = onRequest(
         throw new Error("No data available for the specified date");
       }
 
-      // Fetch volume data using exact days needed
+      // Fetch volume and market cap data using exact days needed
       // market_chart API accepts any number of days, unlike OHLC
-      let volumeResponse;
+      let marketChartResponse;
       try {
-        volumeResponse = await axios.get(
+        marketChartResponse = await axios.get(
           "https://api.coingecko.com/api/v3/coins/ethereum/market_chart",
           {
             params: {
@@ -477,24 +502,42 @@ export const fetchEthDataManual = onRequest(
           data: apiError.response?.data,
           message: apiError.message,
         });
-        // Don't fail completely if volume data fails, just set to 0
-        volumeResponse = { data: { total_volumes: [] } };
+        // Don't fail completely if market data fails, just set to 0
+        marketChartResponse = { data: { total_volumes: [], market_caps: [] } };
       }
 
-      // Find volume for the target date
+      // Find volume and market cap for the target date
       let volume = 0;
-      if (volumeResponse.data && volumeResponse.data.total_volumes) {
-        for (const vol of volumeResponse.data.total_volumes) {
-          const volDate = new Date(vol[0]);
-          volDate.setUTCHours(0, 0, 0, 0);
-          if (volDate.getTime() === targetDate.getTime()) {
-            volume = vol[1];
-            break;
+      let marketCap = 0;
+      
+      if (marketChartResponse.data) {
+        // Extract volume
+        if (marketChartResponse.data.total_volumes) {
+          for (const vol of marketChartResponse.data.total_volumes) {
+            const volDate = new Date(vol[0]);
+            volDate.setUTCHours(0, 0, 0, 0);
+            if (volDate.getTime() === targetDate.getTime()) {
+              volume = vol[1];
+              break;
+            }
+          }
+        }
+        
+        // Extract market cap
+        if (marketChartResponse.data.market_caps) {
+          for (const cap of marketChartResponse.data.market_caps) {
+            const capDate = new Date(cap[0]);
+            capDate.setUTCHours(0, 0, 0, 0);
+            if (capDate.getTime() === targetDate.getTime()) {
+              marketCap = cap[1];
+              break;
+            }
           }
         }
       }
 
       // Create the document data
+      // Note: totalSupply is not available for historical data in free tier API
       const docData: EthDailyMetrics = {
         timestamp: admin.firestore.Timestamp.fromDate(targetDate),
         timestampISO: targetDate.toISOString(),
@@ -505,6 +548,8 @@ export const fetchEthDataManual = onRequest(
           close: dailyOHLC.close,
         },
         volume: volume,
+        marketCap: marketCap,
+        // totalSupply not available for historical data in free tier
       };
       const now = admin.firestore.Timestamp.now();
 
@@ -598,9 +643,9 @@ export const backfillEthData = onRequest(
         throw new Error("No OHLC data received from CoinGecko API");
       }
 
-      // Fetch volume data using exact days needed
+      // Fetch volume and market cap data using exact days needed
       // market_chart API accepts any number of days, unlike OHLC
-      const volumeResponse = await axios.get(
+      const marketChartResponse = await axios.get(
         "https://api.coingecko.com/api/v3/coins/ethereum/market_chart",
         {
           params: {
@@ -613,12 +658,27 @@ export const backfillEthData = onRequest(
       );
 
       const volumeMap = new Map<string, number>();
-      if (volumeResponse.data && volumeResponse.data.total_volumes) {
-        for (const vol of volumeResponse.data.total_volumes) {
-          const date = new Date(vol[0]);
-          date.setUTCHours(0, 0, 0, 0);
-          const dateStr = date.toISOString().split("T")[0];
-          volumeMap.set(dateStr, vol[1]);
+      const marketCapMap = new Map<string, number>();
+      
+      if (marketChartResponse.data) {
+        // Extract volumes
+        if (marketChartResponse.data.total_volumes) {
+          for (const vol of marketChartResponse.data.total_volumes) {
+            const date = new Date(vol[0]);
+            date.setUTCHours(0, 0, 0, 0);
+            const dateStr = date.toISOString().split("T")[0];
+            volumeMap.set(dateStr, vol[1]);
+          }
+        }
+        
+        // Extract market caps
+        if (marketChartResponse.data.market_caps) {
+          for (const cap of marketChartResponse.data.market_caps) {
+            const date = new Date(cap[0]);
+            date.setUTCHours(0, 0, 0, 0);
+            const dateStr = date.toISOString().split("T")[0];
+            marketCapMap.set(dateStr, cap[1]);
+          }
         }
       }
 
@@ -643,6 +703,8 @@ export const backfillEthData = onRequest(
             close: ohlc.close,
           },
           volume: volumeMap.get(dateStr) || 0,
+          marketCap: marketCapMap.get(dateStr) || 0,
+          // totalSupply not available for historical data in free tier
           createdAt: now,
           updatedAt: now,
         };

@@ -2,40 +2,45 @@
 
 import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import { generateLineData, generateTimeLabels } from '@/utils/mockData';
 import DashboardCard from '@/components/common/DashboardCard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getChartOptions, commonChartOptions } from '@/utils/chartConfig';
 import { LineChartData } from '@/types/charts';
+import { useMonthlyMetrics } from '@/hooks/useMonthlyMetrics';
 
 export default function TotalSupplyChart() {
   const { theme } = useTheme();
-  const [data, setData] = useState<LineChartData | null>(null);
+  const [chartData, setChartData] = useState<LineChartData | null>(null);
   const isLight = theme === 'light';
+  
+  // Fetch real data from Firebase
+  const { data: monthlyData, loading, error } = useMonthlyMetrics(12);
 
   useEffect(() => {
-    setData({
-      labels: generateTimeLabels(12),
-      datasets: [
-        {
-          label: 'Total Supply',
-          data: [120.2, 120.18, 120.15, 120.13, 120.11, 120.09, 120.08, 120.05, 120.04, 120.02, 120.01, 119.99],
-          borderColor: '#3B82F6',
-          backgroundColor: 'transparent',
-          tension: 0.1,
-          yAxisID: 'y',
-        },
-        {
-          label: 'Total Market Cap',
-          data: generateLineData(12, 350, 50),
-          borderColor: '#10B981',
-          backgroundColor: 'transparent',
-          tension: 0.1,
-          yAxisID: 'y2',
-        }
-      ]
-    });
-  }, []);
+    if (monthlyData) {
+      setChartData({
+        labels: monthlyData.labels,
+        datasets: [
+          {
+            label: 'Total Supply',
+            data: monthlyData.totalSupply,
+            borderColor: '#3B82F6',
+            backgroundColor: 'transparent',
+            tension: 0.1,
+            yAxisID: 'y',
+          },
+          {
+            label: 'Total Market Cap',
+            data: monthlyData.marketCap,
+            borderColor: '#10B981',
+            backgroundColor: 'transparent',
+            tension: 0.1,
+            yAxisID: 'y2',
+          }
+        ]
+      });
+    }
+  }, [monthlyData]);
 
   const options = {
     ...commonChartOptions,
@@ -95,7 +100,35 @@ export default function TotalSupplyChart() {
     }
   };
 
-  if (!data) return null;
+  // Show loading state
+  if (loading) {
+    return (
+      <DashboardCard>
+        <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-title)' }}>
+          ETH 总供应量 & 市值 (12个月)
+        </h2>
+        <div className="relative flex items-center justify-center" style={{ height: '300px' }}>
+          <div className="text-gray-500">Loading...</div>
+        </div>
+      </DashboardCard>
+    );
+  }
+
+  // Show error state if there's an error and no data
+  if (error && !chartData) {
+    return (
+      <DashboardCard>
+        <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-title)' }}>
+          ETH 总供应量 & 市值 (12个月)
+        </h2>
+        <div className="relative flex items-center justify-center" style={{ height: '300px' }}>
+          <div className="text-red-500">Failed to load data. Using mock data.</div>
+        </div>
+      </DashboardCard>
+    );
+  }
+
+  if (!chartData) return null;
 
   return (
     <DashboardCard>
@@ -103,7 +136,7 @@ export default function TotalSupplyChart() {
         ETH 总供应量 & 市值 (12个月)
       </h2>
       <div className="relative" style={{ height: '300px' }}>
-        <Line data={data} options={options} />
+        <Line data={chartData} options={options} />
       </div>
     </DashboardCard>
   );

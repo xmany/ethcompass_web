@@ -29,4 +29,5 @@ admin.initializeApp();
 // this will be the maximum concurrent request count.
 setGlobalOptions({ maxInstances: 10, region: kRegion });
 
-export * from "./ethDailyPriceVolume";
+export * from "./ethDailyMetrics";
+export * from "./ethMonthlyMetrics";
