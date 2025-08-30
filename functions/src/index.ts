@@ -282,14 +282,13 @@ function getDailyOHLCForDate(
  */
 export const fetchEthDailyData = onSchedule(
   {
-    schedule: "5 0 * * *", // Run at 00:05 UTC daily
+    schedule: "58 5 * * *", // Run at 00:05 UTC daily
     timeZone: "UTC",
     retryCount: 3,
     maxRetrySeconds: 600,
   },
   async (event): Promise<void> => {
     try {
-      logger.info("Starting ETH daily data fetch", {structuredData: true});
 
       // Get yesterday's date (since we're fetching completed day's data)
       const yesterday = new Date();
@@ -297,6 +296,8 @@ export const fetchEthDailyData = onSchedule(
       yesterday.setUTCHours(0, 0, 0, 0);
 
       const dateStr = yesterday.toISOString().split("T")[0]; // YYYY-MM-DD format
+
+      logger.info(`Starting ETH daily data fetch ${dateStr}`, {structuredData: true});
 
       // Fetch OHLC data from CoinGecko API
       // Using the free tier API endpoint
@@ -324,23 +325,33 @@ export const fetchEthDailyData = onSchedule(
         throw new Error("No data available for yesterday");
       }
 
-      // Fetch volume data separately
+      // Fetch volume data using market_chart API with 2 days (to get yesterday's data)
+      // market_chart API accepts any number of days, not limited like OHLC
       const volumeResponse = await axios.get(
-        "https://api.coingecko.com/api/v3/coins/ethereum",
+        "https://api.coingecko.com/api/v3/coins/ethereum/market_chart",
         {
           params: {
             // x_cg_demo_api_key: process.env.COINGECKO_API_KEY,
-            localization: false,
-            tickers: false,
-            market_data: true,
-            community_data: false,
-            developer_data: false,
-            sparkline: false,
+            vs_currency: "usd",
+            days: 2, // Only fetch 2 days to get yesterday's volume
+            interval: "daily",
+            precision: 0, // No decimal places
           },
         }
       );
 
-      const volume = volumeResponse.data.market_data.total_volume.usd || 0;
+      // Find volume for yesterday
+      let volume = 0;
+      if (volumeResponse.data && volumeResponse.data.total_volumes) {
+        for (const vol of volumeResponse.data.total_volumes) {
+          const volDate = new Date(vol[0]);
+          volDate.setUTCHours(0, 0, 0, 0);
+          if (volDate.getTime() === yesterday.getTime()) {
+            volume = vol[1];
+            break;
+          }
+        }
+      }
 
       // Create the document data
       const docData: EthDailyMetrics = {
@@ -468,7 +479,8 @@ export const fetchEthDataManual = onRequest(
         throw new Error("No data available for the specified date");
       }
 
-      // Fetch volume data
+      // Fetch volume data using exact days needed
+      // market_chart API accepts any number of days, unlike OHLC
       let volumeResponse;
       try {
         volumeResponse = await axios.get(
@@ -477,8 +489,9 @@ export const fetchEthDataManual = onRequest(
             params: {
               // x_cg_demo_api_key: process.env.COINGECKO_API_KEY,
               vs_currency: "usd",
-              days: validDays, // Use same valid days value
+              days: daysDiff + 1, // Use exact days needed (add 1 to include target date)
               interval: "daily",
+              precision: 0, // No decimal places
             },
           }
         );
@@ -599,14 +612,15 @@ export const backfillEthData = onRequest(
         throw new Error("No OHLC data received from CoinGecko API");
       }
 
-      // Fetch volume data
+      // Fetch volume data using exact days needed
+      // market_chart API accepts any number of days, unlike OHLC
       const volumeResponse = await axios.get(
         "https://api.coingecko.com/api/v3/coins/ethereum/market_chart",
         {
           params: {
             // x_cg_demo_api_key: process.env.COINGECKO_API_KEY,
             vs_currency: "usd",
-            days: validDays, // Use same valid days value
+            days: daysToFetch, // Use exact days requested since market_chart accepts any number
             interval: "daily",
           },
         }
